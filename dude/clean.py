@@ -11,4 +11,4 @@ def clean_experiments(cfg, experiments):
         folder = core.get_folder(cfg, experiment, run)
         print "Cleaning", folder
         shutil.rmtree(folder)
-    
+

@@ -8,14 +8,14 @@ import re
 import glob
 
 class LineSelect:
-    def __init__(self, name, groupby = [], header = None, 
+    def __init__(self, name, groupby = [], header = None,
                  regex = '.*', split = (lambda line: line) ):
         self.name = name
         self.groupby = groupby
         self.header = header
         self.regex  = regex
         self.split  = split
-        
+
     def proc(self, optpt, stdout, summary, folder):
         keys = optpt.keys()
         keys.sort()
@@ -52,7 +52,7 @@ class LineSelect:
 
 class FilesLineSelect:
     """ Document this!!! """
-    def __init__(self, name, files, groupby = [], header = None, 
+    def __init__(self, name, files, groupby = [], header = None,
                  regex = '.*', split = (lambda line: line),
                  fname_split = (lambda fname: fname),
                  fname_header = None,
@@ -114,16 +114,16 @@ class FilesLineSelect:
         wd = os.getcwd()
         os.chdir(folder)
         self.proc({}, None, fd, None)
-        os.chdir(wd)  
+        os.chdir(wd)
 
 
 class MultiLineSelect:
-    def __init__(self, name, groupby = [], 
+    def __init__(self, name, groupby = [],
                  filters = [("", '.*', (lambda line: line))] ):
         self.name    = name
         self.groupby = groupby
         self.filters   = filters
-        
+
     def proc(self, optpt, stdout, summary, folder):
         keys = optpt.keys()
         keys.sort()
@@ -143,11 +143,11 @@ class MultiLineSelect:
                 if re.match(regex, l):
                     # check if position is empty
                     assert v[i] == None
-                    
+
                     # add value to position
                     v[i] = split(l[:-1])
                     assert v[i] != None
-                
+
             complete = True
             for p in v:
                 if p == None:
@@ -173,7 +173,7 @@ class MultiLineSelect:
 
 class FilesMultiLineSelect:
     """ Document this!!! """
-    def __init__(self, name, files, groupby = [], 
+    def __init__(self, name, files, groupby = [],
                  filters = [("", '.*', (lambda line: line))],
                  fname_split = (lambda fname: fname),
                  fname_header = None
@@ -184,7 +184,7 @@ class FilesMultiLineSelect:
         self.files   = files
         self.fname_split = fname_split
         self.fname_header = fname_header
-        
+
     def proc(self, optpt, stdout, summary, folder):
         keys = optpt.keys()
         keys.sort()
@@ -213,11 +213,11 @@ class FilesMultiLineSelect:
                     if re.match(regex, l):
                         # check if position is empty
                         assert v[i] == None
-                    
+
                         # add value to position
                         v[i] = split(l[:-1])
                         assert v[i] != None
-                
+
                 complete = True
                 for p in v:
                     if p == None:

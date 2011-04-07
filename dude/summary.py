@@ -11,7 +11,7 @@ def preprocess_one(cfg, s):
     """ """
     assert False and "Not implemented"
 
-    # get experiments 
+    # get experiments
     experiments = core.get_experiments(cfg)
     wd = os.getcwd()
     for experiment in experiments:
@@ -31,7 +31,7 @@ def summarize_one(cfg, s, filtered_experiments):
         run, experiment = exp
         experiments.append(experiment)
 
-    # group by X 
+    # group by X
     options = {}
     for k in s['groupby']: # select the right options
         options[k] = cfg.options[k]
@@ -39,25 +39,25 @@ def summarize_one(cfg, s, filtered_experiments):
 
     # create summary output directory if necessary
     utils.checkFolder(cfg.sum_output_dir)
-    
+
     # save working directory
     wd = os.getcwd()
 
-    print 
+    print
     print "starting summary", s['name']
 
     # for each group, call process of s
     for (group, elements) in groups:
         print "Group: ", group, " entries:", len(elements)
         options = {}
-        for i in s['dimensions']: 
+        for i in s['dimensions']:
             options[i] = cfg.options[i]
 
         # get experiments that match ?????
         space = utils.groupBy(elements, options)
 
         oFile = cfg.sum_output_dir + '/' + core.get_name(s['name'],group)
-        
+
         # prepare columns and sizes for print
         other_cols = ["entries", "files"]
         cols = s['dimensions'] + other_cols
@@ -91,8 +91,8 @@ def summarize_one(cfg, s, filtered_experiments):
 
         for (point, samples) in space:
             outputs = []
-            proc = 0 
-            
+            proc = 0
+
             for sample in samples:
                 proc = 0
                 for run in range(1, cfg.runs+1):
@@ -131,8 +131,8 @@ def summarize(cfg, filtered_experiments, sel = []):
     for s in sel:
         print s, "not valid"
 
-            
-        
+
+
 
 
 def check_cfg(cfg):

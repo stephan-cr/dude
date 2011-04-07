@@ -37,7 +37,7 @@ def show_info(cfg, options = {}, run = 0):
             print 'Filters: None'
         print
     else:
-        print 
+        print
         print 'Experiment: '
         for k in options.keys():
             print '%8s' % (k), '=', options[k]
@@ -56,20 +56,20 @@ def print_exp(actual_runs, executed_runs, missing_runs, total_runs,
         percent_exec = 100
     else:
         percent_exec = executed_runs/missing_runs*100
-    
+
     # strings
     runs = "run %d of %d: remaining runs %d of %d (%d%%)" % (actual_runs, total_runs,
-                                                             missing_runs - executed_runs, missing_runs, 
+                                                             missing_runs - executed_runs, missing_runs,
                                                              percent_exec)
-    elapsed = "elapsed: %s" % utils.sec2string(total_time) 
+    elapsed = "elapsed: %s" % utils.sec2string(total_time)
     remaining = "remaining: %s" % utils.sec2string(remaining_time)
-    
+
     print "====", runs, elapsed, remaining, "===="
-    
+
 def print_exp_simple(actual_runs, total_runs, missing_runs):
     #percent_exec = 100*actual_runs/total_runs
-    
-    runs = "run %d of %d: remaining runs %d" % (actual_runs, 
-                                                total_runs, 
+
+    runs = "run %d of %d: remaining runs %d" % (actual_runs,
+                                                total_runs,
                                                 missing_runs)
     print "====", runs, "===="

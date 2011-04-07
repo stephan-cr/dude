@@ -4,4 +4,4 @@
 
 import core
 
-def 
+def
