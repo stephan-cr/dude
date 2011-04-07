@@ -57,7 +57,7 @@ def run_program(cfg, cmd, timeout, fname, show_output = True):
     # shell=False, bufsize=0
     p = subprocess.Popen(cmd, shell=True,
                          stderr=f,
-                         stdout=f)   
+                         stdout=f)
     set_catcher(p)
     global_cfg = cfg
     t = Timer(timeout, kill_on_timeout, [cfg, p])
@@ -66,7 +66,7 @@ def run_program(cfg, cmd, timeout, fname, show_output = True):
     retcode = None
 
     # make stdout of process non-blocking
-    
+
     fd = fr.fileno() # p.stdout.fileno()
     fl = fcntl.fcntl(fd, fcntl.F_GETFL)
     fcntl.fcntl(fd, fcntl.F_SETFL, fl | os.O_NONBLOCK)
@@ -132,11 +132,11 @@ def execute(cfg, experiment, run, show_output):
     if run == 1:
         # show experiment info
         info.show_info(cfg, experiment, run)
-    
+
     # skip successful runs
     if core.exist_status_file(folder):
         val = core.read_status_file(folder)
-        if val == 0: 
+        if val == 0:
             # it ran successfully, dont repeat exp
             print '<-> skipping ' + str(run)
             print "Run", run, "skipped"
@@ -154,15 +154,15 @@ def execute(cfg, experiment, run, show_output):
     #(s, o) = commands.getstatusoutput(cmd)
     s = run_program(cfg, cmd, cfg.timeout, core.outputFile, show_output)
     e_end = tc()
-			
+
     if s != 0:
         print "error: ", str(s)
 
-        
+
     f = open(core.statusFile,'w')
     f.write(str(s))
     f.close()
-    
+
     # call prepare experiment
     if hasattr(cfg, 'finish_exp'):
         cfg.finish_exp(experiment)
@@ -179,7 +179,7 @@ def execute(cfg, experiment, run, show_output):
 def run(cfg, experiments, options):
     """Generate the experiment space and calls execute() for each experiment"""
     # check configuration and folders
-    #self.checkRequirements() 
+    #self.checkRequirements()
     #self.checkFolders()
 
     # print information
@@ -203,12 +203,12 @@ def run(cfg, experiments, options):
     # execution loop
     for i in range(0, len(experiments)):
         run,experiment = experiments[i]
-        # One more run 
+        # One more run
         actual_runs += 1
         # Execute the measurement
         exp_cpy = experiment.copy()
         (executed, etime) = execute(cfg, exp_cpy, run, options.show_output)
-        
+
         if executed:
             executed_runs += 1
 
@@ -217,7 +217,7 @@ def run(cfg, experiments, options):
 
         # Calculate the total time
         t_actual = tc()
-				
+
         # Print some time information
         info.print_exp(actual_runs, executed_runs, missing_runs, total_runs, t_actual - t_start, elapsed_time)
 

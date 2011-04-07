@@ -27,7 +27,7 @@ options = {
 }
 
 raw_output_dir = "raw"
-def prepare_global(): 
+def prepare_global():
     pass
 def prepare_exp(optpt):
     pass
