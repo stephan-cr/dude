@@ -23,8 +23,9 @@ class LineSelect:
         for k in keys:
             s += optpt[k] + ' '
 
+        re_prog = re.compile(self.regex)
         for l in stdout.readlines():
-            if re.match(self.regex, l):
+            if re_prog.match(l):
                 print >>summary, s + self.split(l[:-1])
     # s =''
     # for d in dimensions:
@@ -82,12 +83,17 @@ class FilesLineSelect:
             assert self.files.__class__ == [].__class__
 
         print "FilesLineSelect using files ", files
+        re_prog = re.compile(self.regex)
         for fn in files:
             f = open(fn)
             lines_offset = 1 if self.has_header else 0
-            for l in f.readlines()[lines_offset:]:
-                if re.match(self.regex, l):
-                    print >>summary, s + ' ' + self.fname_split(fn) + ' ' + self.split(l[:-1])
+            skip = lines_offset
+            for l in f:
+                if skip > 0:
+                    skip -= 1
+                else:
+                    if re_prog.match(l):
+                        print >>summary, s + ' ' + self.fname_split(fn) + ' ' + self.split(l[:-1])
             f.close()
 
     def as_dict(self, cfg):
@@ -202,7 +208,7 @@ class FilesMultiLineSelect:
         for fn in files:
             f = open(fn)
             v = []
-            for l in f.readlines():
+            for l in f:
                 if v == []:
                     # reserve place for pairs
                     for i in range(0, len(self.filters)):
