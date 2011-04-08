@@ -1,4 +1,4 @@
-# Copyright (c) 2010 Diogo Becker
+# Copyright (c) 2010 Diogo Becker, Stephan Creutz
 # Distributed under the MIT License
 # See accompanying file LICENSE
 
