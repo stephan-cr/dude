@@ -42,7 +42,8 @@ def show_info(cfg, options = {}, run = 0):
         for k in options.keys():
             print '%8s' % (k), '=', options[k]
         print '%8s' %('CWD'), '=', core.get_folder(cfg, options, run)
-        print '%8s' %('CMD'), '=', cfg.get_cmd(options)
+        if hasattr(cfg, 'get_cmd'):
+            print '%8s' %('CMD'), '=', cfg.get_cmd(options)
 
 
 def print_run(actual_runs, status, experiment_elapsed_time):
