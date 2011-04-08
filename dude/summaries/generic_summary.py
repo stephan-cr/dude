@@ -56,7 +56,8 @@ class FilesLineSelect:
                  regex = '.*', split = (lambda line: line),
                  fname_split = (lambda fname: fname),
                  fname_header = None,
-                 has_header=False
+                 has_header=False,
+                 quiet = False
                  ):
         self.name = name
         self.groupby = groupby
@@ -67,6 +68,7 @@ class FilesLineSelect:
         self.fname_split = fname_split
         self.fname_header = fname_header
         self.has_header = has_header
+        self.quiet = quiet
 
 
     def proc(self, optpt, stdout, summary, folder):
@@ -81,7 +83,8 @@ class FilesLineSelect:
         else:
             assert self.files.__class__ == [].__class__
 
-        print "FilesLineSelect using files ", files
+        if not self.quiet:
+            print "FilesLineSelect using files ", files
         for fn in files:
             f = open(fn)
             lines_offset = 1 if self.has_header else 0
