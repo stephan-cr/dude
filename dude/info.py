@@ -54,14 +54,15 @@ def print_exp(actual_runs, executed_runs, missing_runs, total_runs,
               total_time, elapsed_time):
     remaining_time = elapsed_time.mean()*(missing_runs-executed_runs)
     if missing_runs == 0:
-        percent_exec = 100
+        percent_exec = 100.0
     else:
-        percent_exec = executed_runs/missing_runs*100
+        percent_exec = float(executed_runs)/float(missing_runs)*100.0
 
     # strings
-    runs = "run %d of %d: remaining runs %d of %d (%d%%)" % (actual_runs, total_runs,
-                                                             missing_runs - executed_runs, missing_runs,
-                                                             percent_exec)
+    runs = "run %d of %d: remaining runs %d of %d (%.1f%%)" % (actual_runs, total_runs,
+                                                               missing_runs - executed_runs,
+                                                               missing_runs,
+                                                               percent_exec)
     elapsed = "elapsed: %s" % utils.sec2string(total_time)
     remaining = "remaining: %s" % utils.sec2string(remaining_time)
 
