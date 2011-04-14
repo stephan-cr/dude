@@ -17,11 +17,13 @@ import dude
 
 if __name__ == '__main__':
      desc = """Commands:
+       clean\t delete experiments
+       failed\t list all failed experiments
+       info\t show experiment description info
+       list\t list directories of executed experiments
+       missing\t list all missing experiments
        run\t run all experiments
        sum\t summarize results using given summaries
-       info\t show experiment description info
-       clean\t delete  experiments
-       list\t list directories of executed experiments
      """
      parser = optparse.OptionParser(usage="%prog [options] command",
                                     version="%prog " + dude.__version__,
