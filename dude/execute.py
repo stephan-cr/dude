@@ -42,7 +42,6 @@ def sig_handler(signum, frame, proc):
 def kill_on_timeout(cfg, proc):
     """Kills experiment processes on timeout"""
     print "Killing experiment"
-    print dir(proc)
     proc.send_signal(signal.SIGINT)
     if hasattr(cfg, 'on_timeout'):
         cfg.on_kill(proc)
