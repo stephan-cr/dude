@@ -30,7 +30,8 @@ def get_experiments(cfg):
 def get_run_experiments(cfg):
     experiments = get_experiments(cfg)
     run_experiments = []
-    for run in range(1, cfg.runs+1):
+    runs = cfg.runs if hasattr(cfg, 'runs') else 1
+    for run in range(1, runs+1):
         for experiment in experiments:
             run_experiments.append( (run, experiment) )
     return run_experiments
@@ -179,6 +180,9 @@ def check_cfg(cfg):
         assert type(cfg.constraints) == list
     else:
         cfg.constraints = []
+
+    assert not hasattr(cfg, 'runs') or type(cfg.runs) == int
+
     assert hasattr(cfg, 'raw_output_dir')
 
     assert hasattr(cfg, 'dude_version')
