@@ -6,8 +6,11 @@ import os, math
 import sys
 import commands
 
-# result = cartesian(sets, 0, {})
-def cartesian(sets, i, element):
+def cartesian(sets):
+        return __cartesian(sets, 0, {})
+
+# result = __cartesian(sets, 0, {})
+def __cartesian(sets, i, element):
 	keys = sets.keys()
 	if i == len(keys):
 		return [element.copy()]
@@ -15,7 +18,7 @@ def cartesian(sets, i, element):
 		product = []
 		for value in sets[keys[i]]:
 			element[keys[i]] = value
-			product += cartesian(sets, i+1, element)
+			product += __cartesian(sets, i+1, element)
 	return product
 
 

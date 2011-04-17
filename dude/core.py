@@ -17,7 +17,7 @@ outputFile = 'dude.output'
 def get_experiments(cfg):
     """Creates a list of experiments."""
     # TODO: sampling
-    exps = utils.cartesian(cfg.options, 0, {})
+    exps = utils.cartesian(cfg.options)
     if hasattr(cfg, 'constraints'):
         for c in cfg.constraints:
             exps_tmp = []
