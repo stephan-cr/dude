@@ -2,7 +2,7 @@
 # Distributed under the MIT License
 # See accompanying file LICENSE
 
-"""Core funtionality consists of generating points in the options space and generating names out of options.
+"""Core functionality consists of generating points in the options space and generating names out of options.
 """
 import os
 import commands
@@ -45,7 +45,7 @@ def get_raw_folder(cfg):
 
 def get_name(prefix, options):
     """Given a prefix, and an experiment (options), creates the a string to
-    identify the expeeriment."""
+    identify the experiment."""
     s = prefix
     l = options.keys()
     l.sort()

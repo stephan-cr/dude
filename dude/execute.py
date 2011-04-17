@@ -137,7 +137,7 @@ def execute(cfg, experiment, run, show_output):
     if core.exist_status_file(folder):
         val = core.read_status_file(folder)
         if val == 0:
-            # it ran successfully, dont repeat exp
+            # it ran successfully, don't repeat exp
             print '<-> skipping ' + str(run)
             print "Run", run, "skipped"
             return (False, 0)
