@@ -38,8 +38,8 @@ def finish_exp(optpt):
 
 sum_output_dir = "output"
 
-import summaries
-sum = summaries.LineSelect (
+import dude.summaries
+sum = dude.summaries.LineSelect (
 	name   = 'example_summary',
         regex  = '.*',
         split  = (lambda l: l.split(':')[1])
