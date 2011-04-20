@@ -1,0 +1,35 @@
+
+
+Overview of files:
+
+* dude
+  - the main program which put the functionalities together
+  - 
+* core.py
+  - transforms options in names (directory names)
+  - 
+
+* execute.py
+  - takes option space and execute commands if necessary
+    
+* summary.py
+  - checks for runs that worked, and process data
+  - add option to specify one of the summaries
+
+* failed_check.py
+  - checks for runs that failed
+  - it can use the "traditional" method, i.e., return value
+  - it can take number of user functions and process the log files
+  - should exclude experiments from the summary processing
+
+* search.py  
+  - search for experiments which match something defined in a function
+  - return a list of subdirectories to user
+  - --include-failed
+
+* utils.py
+ - generic funtions like cartesian product, mean, so on
+
+* env.sh
+
+* example/
