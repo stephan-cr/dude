@@ -41,7 +41,13 @@ if __name__ == '__main__':
      parser.add_option("-i",  "--invert-filters", default = False,
                        dest = "invert", action = "store_true",
                        help = "invert filter selection")
-
+     parser.add_option("-a", "--args",
+                       dest = "dargs", metavar = "ARGS",
+                       help = "arguments to Dudefile separated by semicolons"
+                       "\ne.g. -a \"option1=value;option2=[value3,value4]\"")
+     parser.add_option("--dry", default = False,
+                       dest = "dry", action = "store_true",
+                       help = "dry run (sets global dry variable to True)")
      group2 = optparse.OptionGroup(parser, 'run specific options')
      group2.add_option("-n","--no-output", action = "store_false",
                        dest = "show_output", default = True,
@@ -96,6 +102,13 @@ if __name__ == '__main__':
 
           dude.core.check_cfg(e)
           dude.summary.check_cfg(e)
+
+          # set dry run variable
+          if options.dry:
+               e.dry = True
+          else:
+               e.dry = False
+
 
           # TODO: the selection of experiments and how that interact with the commands should be redone.
           # the last parameter to filter_experiments include or exclude the not yet run experiments
