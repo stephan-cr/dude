@@ -5,6 +5,7 @@
 """ """
 import core
 import shutil
+import os
 
 def clean_experiments(cfg, experiments):
     for run,experiment in experiments:
@@ -12,3 +13,6 @@ def clean_experiments(cfg, experiments):
         print "Cleaning", folder
         shutil.rmtree(folder)
 
+def clean_experiment(folder):
+    print "Cleaning", folder
+    os.remove(folder+'/dude.status')

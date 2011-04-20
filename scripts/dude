@@ -58,6 +58,10 @@ if __name__ == '__main__':
      group2.add_option("--skip-global", default = False,
                        dest = "skip_global", action = "store_true",
                        help = "skip global prepare")
+     group2.add_option("--global-only", default = False,
+                       dest = "global_only", action = "store_true",
+                       help = "run global prepare only")
+
 
 
      group4 = optparse.OptionGroup(parser, 'list specific options')
@@ -130,6 +134,15 @@ if __name__ == '__main__':
                if options.force:
                     dude.clean.clean_experiments(e, experiments)
                dude.execute.run(e, experiments, options)
+          elif cmd == 'run-once':
+               assert len(experiments) == 1
+               optpt =  experiments[0][1]
+               dude.execute.init()
+               folder = "once"
+               dude.utils.checkFolder(folder) # create if necessary
+               if options.force:
+                    dude.clean.clean_experiment(folder)
+               dude.execute.execute(e, optpt, 1, options.show_output, folder)
           elif cmd == 'sum':
                dude.summary.summarize(e, experiments, args[1:])
           elif cmd == 'list':

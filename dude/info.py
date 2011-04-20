@@ -6,7 +6,7 @@
 import utils
 import core
 
-def show_info(cfg, options = {}, run = 0):
+def show_info(cfg, options = {}, run = 0, folder = None):
     if options == {}:
         print '----------------------------------'
         print 'Experiment', cfg.name
@@ -41,7 +41,9 @@ def show_info(cfg, options = {}, run = 0):
         print 'Experiment: '
         for k in options.keys():
             print '%8s' % (k), '=', options[k]
-        print '%8s' %('CWD'), '=', core.get_folder(cfg, options, run)
+        if folder == None:
+            folder = core.get_folder(cfg, options, run)
+        print '%8s' %('CWD'), '=', folder
         if hasattr(cfg, 'get_cmd'):
             print '%8s' %('CMD'), '=', cfg.get_cmd(options)
 

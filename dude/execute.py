@@ -236,7 +236,7 @@ def set_catcher(proc):
         signal.signal(signal.SIGINT, lambda num, frame: sig_handler(num,frame,proc) )
 
 
-def execute_safe(cfg, optpt, run, show_output):
+def execute_safe(cfg, optpt, run, show_output, folder = None):
     """Executes one experiment configuration for a run"""
     start = tc()
 
@@ -247,11 +247,12 @@ def execute_safe(cfg, optpt, run, show_output):
     e_start = e_end = 0
 
     # get dir name and create if necessary
-    folder = core.get_folder(cfg, optpt, run)
+    if folder == None:
+        folder = core.get_folder(cfg, optpt, run)
 
     if run == 1:
         # show experiment info
-        info.show_info(cfg, optpt, run)
+        info.show_info(cfg, optpt, run, folder)
 
     # skip successful runs
     if core.exist_status_file(folder):
@@ -299,10 +300,10 @@ def execute_safe(cfg, optpt, run, show_output):
     info.print_run(run, s, (e_end - e_start))
     return (True, (end-start))
 
-def execute(cfg, optpt, run, show_output):
+def execute(cfg, optpt, run, show_output, folder = None):
     signal.signal(signal.SIGINT, signal.SIG_DFL)
     try:
-        return execute_safe(cfg, optpt, run, show_output)
+        return execute_safe(cfg, optpt, run, show_output, folder)
     except KeyboardInterrupt, e:
         print e
         return (False, 0)
@@ -331,6 +332,9 @@ def run(cfg, experiments, options):
         except KeyboardInterrupt, e:
             print "Interrupted on prepare_global()"
             sys.exit(1)
+
+    if options.global_only:
+        return
 
     # print initial info
     info.print_exp_simple(1, total_runs, missing_runs)
