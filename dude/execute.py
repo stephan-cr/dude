@@ -123,11 +123,13 @@ def fork_experiment(cfg, optpt, timeout, fname, show_output = True):
                 (npid, status) = os.waitpid(gpid, os.WNOHANG)
                 #print npid, status
                 if (npid, status) != (0,0):
-                    print "yeah!"
                     done = True
-                time.sleep(5)
+
                 elapsed = time.time() - start_time
-                print "%d" % (int(elapsed)), "seconds elapsed"
+                if elapsed > 5:
+                    time.sleep(5)
+                    elapsed = time.time() - start_time
+                    print "%d" % (int(elapsed)), "seconds elapsed"
 
         killer.cancel()
         f.close()
@@ -145,7 +147,7 @@ def fork_experiment(cfg, optpt, timeout, fname, show_output = True):
         w = os.fdopen(w, 'w')
         sys.stdout = f
         sys.stderr = f
-        print "child start"
+        print "dude: child start"
         timeout = 2 # seconds
         t = None
         def flushit(t):
@@ -158,7 +160,7 @@ def fork_experiment(cfg, optpt, timeout, fname, show_output = True):
         except Exception, e:
             print e
             sys.exit(1) 
-        print "child exit"
+        print "dude: child exit"
         f.flush()
         t.cancel()
         w.flush()
