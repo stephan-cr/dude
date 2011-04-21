@@ -12,7 +12,6 @@ import sys
 import optparse
 import imp
 
-
 import dude
 
 if __name__ == '__main__':
@@ -42,7 +41,7 @@ if __name__ == '__main__':
                        dest = "invert", action = "store_true",
                        help = "invert filter selection")
      parser.add_option("-a", "--args",
-                       dest = "dargs", metavar = "ARGS",
+                       dest = "margs", metavar = "ARGS",
                        help = "arguments to Dudefile separated by semicolons"
                        "\ne.g. -a \"option1=value;option2=[value3,value4]\"")
      parser.add_option("--dry", default = False,
@@ -113,6 +112,11 @@ if __name__ == '__main__':
           else:
                e.dry = False
 
+          # parse arguments to module
+          if options.margs:
+               margs = dude.args.parse(options.margs)
+               print "arguments to Dudefile:", margs
+               dude.args.set_args(e, margs)
 
           # TODO: the selection of experiments and how that interact with the commands should be redone.
           # the last parameter to filter_experiments include or exclude the not yet run experiments

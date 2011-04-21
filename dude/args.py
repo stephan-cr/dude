@@ -6,23 +6,12 @@ import string
 import re
 import utils
 
-_args = None
+def parse(args):
+    """ parse arguments in this format: \"option1=value;option2=[value3,value4]\"
+    and returns a dictionary { option1 : [ value ] , option2 : [value3, value4]
+    """
 
 
-def get(key, default):
-    print _args
-    if _args == None or not _args.has_key(key):
-        return default
-    else:
-        return _args[key]
-
-
-def get_or_die(key):
-    val = get(key, None)
-    assert val != None
-    return val
-
-def _parse(args):
     flts = {}
     for f in args.split(';'):
         fs = f.split('=')
@@ -37,6 +26,22 @@ def _parse(args):
     return flts
 
 
-def init(args):
-    _args = _parse(args)
-    print _args
+def set_args(obj, args):
+    for arg in args:
+        val = args[arg]
+
+        # 1. the argument should already have been defined as a
+        # variable in the object.
+        assert hasattr(obj, arg)
+
+        # 2. it should be possible to convert the same type of the
+        # object's variable.
+        if type(getattr(obj, arg)) != list:
+            # the parsed argument should be a list with a single element
+            assert type(val) == list and len(val) == 1
+            # and we should be able to convert it
+            val = getattr(obj, arg).__class__(val[0]) 
+
+        # -> if no error happened, we can set the value in the
+        # object's variable.
+        setattr(obj, arg, val)
