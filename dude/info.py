@@ -6,6 +6,34 @@
 import utils
 import core
 
+class PBar:
+    """
+    A simple progress bar.
+
+    Based on example at http://snippets.dzone.com/posts/show/5432
+    """
+    def __init__(self, length = 80):
+        self.len = length
+        self.chars = (' ', '+')
+        self.wrap = ('[', ']')
+        self.filledc = 0
+
+    def fill(self, i):
+        assert not (i > 100) or (i < 0)
+        self._setP(i)
+
+    def _setP(self, p):
+        self.filledc = int(round(float(self.len*p)/100))
+
+    def __str__(self):
+        out = []
+        out.append(self.wrap[0])
+        out.append(self.filledc*self.chars[1])
+        out.append((self.len-self.filledc)*self.chars[0])
+        out.append(self.wrap[1])
+        return "".join(out)
+
+
 def show_info(cfg, options = {}, run = 0, folder = None):
     if options == {}:
         print '----------------------------------'
@@ -77,3 +105,11 @@ def print_exp_simple(actual_runs, total_runs, missing_runs):
                                                 total_runs,
                                                 missing_runs)
     print "====", runs, "===="
+
+def print_elapsed(cfg, elapsed):
+    b = PBar(20)
+    p = elapsed * 1000 / cfg.timeout * 100
+    p /= 1000
+    b.fill(p)
+    print b, "\telapsed: %d" % (int(elapsed)), "seconds", " " + chr(27) + '[A'
+

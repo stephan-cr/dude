@@ -129,7 +129,7 @@ def fork_experiment(cfg, optpt, timeout, fname, show_output = True):
                 if elapsed > 5:
                     time.sleep(5)
                     elapsed = time.time() - start_time
-                    print "%d" % (int(elapsed)), "seconds elapsed"
+                    info.print_elapsed(cfg, elapsed)
 
         killer.cancel()
         f.close()
@@ -209,7 +209,7 @@ def run_program(cfg, cmd, timeout, fname, show_output = True):
 
         time.sleep(5)
         elapsed = time.time() - start_time
-        print elapsed, "seconds elapsed"
+        info.print_elapsed(cfg, elapsed)
 
     while True:
         try:
