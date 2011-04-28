@@ -281,8 +281,7 @@ def execute_safe(cfg, optpt, run, show_output, folder = None):
     e_end = tc()
 
     if s != 0:
-        print "error: ", str(s)
-
+        print 'command returned error value: %d' % s
 
     f = open(core.statusFile,'w')
     f.write(str(s))
