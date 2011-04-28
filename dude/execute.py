@@ -3,14 +3,13 @@
 # See accompanying file LICENSE
 
 """Manages the execution of experiments"""
-import commands
+
 import core
 import fcntl
 import info
 import os
 import signal
 import subprocess
-import pty
 import sys
 import time
 import utils
