@@ -56,7 +56,7 @@ def keyint_handler():
 def kill_on_timeout(cfg, proc):
     """Kills experiment processes on timeout"""
     print "Killing experiment"
-    proc.send_signal(signal.SIGINT)
+    proc.send_signal(signal.SIGKILL)
     if hasattr(cfg, 'on_timeout'):
         cfg.on_kill(proc)
 
