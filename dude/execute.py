@@ -23,7 +23,7 @@ catch_sigint = False
 global_cfg = None
 
 
-# there are two ways how to start an experiment. 
+# there are two ways how to start an experiment.
 # Either with a spawn or with a fork
 gproc = None
 gpid  = None
@@ -63,7 +63,7 @@ def kill_on_timeout(cfg, proc):
 def kill_pid(pid, callback):
     """Kill process and execute callback."""
     print "Killing experiment"
-    
+
     try:
         os.kill(pid, signal.SIGTERM)
     except:
@@ -100,7 +100,7 @@ def fork_experiment(cfg, optpt, timeout, fname, show_output = True):
         fd = fr.fileno()
         fl = fcntl.fcntl(fd, fcntl.F_GETFL)
         fcntl.fcntl(fd, fcntl.F_SETFL, fl | os.O_NONBLOCK)
-        
+
         start_time = time.time()
         status = 1
         done = False
@@ -118,7 +118,7 @@ def fork_experiment(cfg, optpt, timeout, fname, show_output = True):
             except IOError, e:
                 if done:
                     break
-                
+
             if not done:
                 (npid, status) = os.waitpid(gpid, os.WNOHANG)
                 #print npid, status
@@ -155,11 +155,11 @@ def fork_experiment(cfg, optpt, timeout, fname, show_output = True):
             t.start()
             f.flush()
         t = Timer(timeout, flushit, [t])
-        try: 
+        try:
             ret = cfg.exp(optpt)
         except Exception, e:
             print e
-            sys.exit(1) 
+            sys.exit(1)
         print "dude: child exit"
         f.flush()
         t.cancel()
@@ -245,7 +245,7 @@ def execute_safe(cfg, optpt, run, show_output, folder = None):
     cmd = None
     if hasattr(cfg, 'get_cmd'):
         cmd = cfg.get_cmd(optpt)
-        
+
     e_start = e_end = 0
 
     # get dir name and create if necessary
