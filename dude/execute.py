@@ -207,7 +207,7 @@ def run_program(cfg, cmd, timeout, fname, show_output = True):
         if retcode != None:
             break
 
-        time.sleep(5)
+        time.sleep(5 if cfg.timeout > 5 else cfg.timeout / 5.0)
         elapsed = time.time() - start_time
         info.print_elapsed(cfg, elapsed)
 
