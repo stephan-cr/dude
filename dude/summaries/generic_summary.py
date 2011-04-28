@@ -97,7 +97,7 @@ class FilesLineSelect:
                     skip -= 1
                 else:
                     if re_prog.match(l):
-                        print >>summary, s + ' ' + self.fname_split(fn) + ' ' + self.split(l[:-1])
+                        print >>summary, s + self.fname_split(fn) + ' ' + self.split(l[:-1])
             f.close()
 
     def as_dict(self, cfg):
