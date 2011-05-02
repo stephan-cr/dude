@@ -2,7 +2,6 @@
 # Distributed under the MIT License
 # See accompanying file LICENSE
 
-import string
 import re
 import utils
 
@@ -11,13 +10,12 @@ def parse(args):
     and returns a dictionary { option1 : [ value ] , option2 : [value3, value4]
     """
 
-
     flts = {}
     for f in args.split(';'):
         fs = f.split('=')
         assert len(fs) == 2
         (key,value) = fs
-        key = string.strip(key)
+        key = key.strip()
         if re.match("\[.*\]", value):
             value = utils.parse_str_list(value)
         else:
@@ -40,7 +38,7 @@ def set_args(obj, args):
             # the parsed argument should be a list with a single element
             assert type(val) == list and len(val) == 1
             # and we should be able to convert it
-            val = getattr(obj, arg).__class__(val[0]) 
+            val = getattr(obj, arg).__class__(val[0])
 
         # -> if no error happened, we can set the value in the
         # object's variable.

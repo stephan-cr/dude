@@ -7,7 +7,6 @@
 import core
 import os
 import utils
-import string
 import re
 
 def filter_one(cfg, experiments, filter, invert, only_ran):
@@ -72,7 +71,7 @@ def filter_inline(cfg, filters, invert, only_ran=True):
         fs = f.split('=')
         assert len(fs) == 2
         (key,value) = fs
-        key = string.strip(key)
+        key = key.strip()
         if re.match("\[.*\]", value):
             value = utils.parse_str_list(value)
         else:

@@ -175,13 +175,12 @@ class IndentedHelpFormatterWithNL(optparse.IndentedHelpFormatter):
 
 
 import re
-import string
 
 def parse_value(v):
     try:
         return int(v)
     except:
-        return string.strip(v)
+        return v.strip()
 
 
 def parse_str_list(l):
