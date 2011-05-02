@@ -4,7 +4,6 @@
 
 import os, math
 import sys
-import commands
 
 def cartesian(sets):
         return __cartesian(sets, 0, {})

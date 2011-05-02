@@ -5,7 +5,6 @@
 """Core functionality consists of generating points in the options space and generating names out of options.
 """
 import os
-import commands
 import utils
 
 ### some constants ####
