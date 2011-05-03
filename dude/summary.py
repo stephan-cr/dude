@@ -3,10 +3,11 @@
 # See accompanying file LICENSE
 
 """ """
-import time
+
 import os
 import core
 import utils
+
 def preprocess_one(cfg, s):
     """ """
     assert False and "Not implemented"
@@ -16,7 +17,7 @@ def preprocess_one(cfg, s):
     wd = os.getcwd()
     for experiment in experiments:
         for run in range(1, cfg.runs+1):
-            if experiment_success(cfg, experiment,run):
+            if experiment_success(cfg, experiment, run):
                 folder = core.get_folder(cfg, experiment, run)
                 os.chdir(folder)
                 fout = open(outputFile)
@@ -27,8 +28,7 @@ def preprocess_one(cfg, s):
 
 def summarize_one(cfg, s, filtered_experiments):
     experiments = []
-    for exp in filtered_experiments:
-        run, experiment = exp
+    for run, experiment in filtered_experiments:
         experiments.append(experiment)
 
     # group by X
@@ -56,7 +56,7 @@ def summarize_one(cfg, s, filtered_experiments):
         # get experiments that match ?????
         space = utils.groupBy(elements, options)
 
-        oFile = cfg.sum_output_dir + '/' + core.get_name(s['name'],group)
+        oFile = cfg.sum_output_dir + '/' + core.get_name(s['name'], group)
 
         # prepare columns and sizes for print
         other_cols = ["entries", "files"]
@@ -66,7 +66,7 @@ def summarize_one(cfg, s, filtered_experiments):
             lengths = map(lambda x: len(str(x)), options[dimension])
             lengths.append(len(dimension))
             cols_sz.append(max(lengths))
-        cols_sz += map(len,other_cols)
+        cols_sz += map(len, other_cols)
 
         # print column titles
         print '-'*(sum(cols_sz)+len(cols_sz))
@@ -90,11 +90,7 @@ def summarize_one(cfg, s, filtered_experiments):
             print >>f, header
 
         for (point, samples) in space:
-            outputs = []
-            proc = 0
-
             for sample in samples:
-                proc = 0
                 for run in range(1, cfg.runs+1):
                     if not (run, sample) in filtered_experiments:
                         continue
@@ -130,10 +126,6 @@ def summarize(cfg, filtered_experiments, sel = []):
 
     for s in sel:
         print s, "not valid"
-
-
-
-
 
 def check_cfg(cfg):
     assert hasattr(cfg, 'sum_output_dir')
