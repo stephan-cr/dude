@@ -5,7 +5,9 @@
 """ """
 
 import os
+
 import core
+import summary_backends
 import utils
 
 def preprocess_one(cfg, s):
@@ -26,7 +28,7 @@ def preprocess_one(cfg, s):
                 fout.close()
                 os.chdir(wd)
 
-def summarize_one(cfg, s, filtered_experiments):
+def summarize_one(cfg, s, filtered_experiments, backend):
     experiments = []
     for run, experiment in filtered_experiments:
         experiments.append(experiment)
@@ -74,7 +76,7 @@ def summarize_one(cfg, s, filtered_experiments):
         print '-'*(sum(cols_sz)+len(cols_sz))
 
         # open file for group
-        f = open(oFile, 'w')
+        f = summary_backends.backend_constructor(backend)(oFile)
 
         # write header
         if s.has_key('header'):
@@ -87,7 +89,7 @@ def summarize_one(cfg, s, filtered_experiments):
                 header += d + ' '
 
             header = s['header'](header)
-            print >>f, header
+            f.write_header(header)
 
         for (point, samples) in space:
             for sample in samples:
@@ -107,7 +109,7 @@ def summarize_one(cfg, s, filtered_experiments):
         f.close()
         # next group
 
-def summarize(cfg, filtered_experiments, sel = []):
+def summarize(cfg, filtered_experiments, sel = [], backend = 'file'):
     """  """
     # TODO check if exists
     if sel == []:
@@ -121,7 +123,7 @@ def summarize(cfg, filtered_experiments, sel = []):
         #if summary.has_key('preprocess'):
         #    preprocess_one(cfg, summary)
         if summary['name'] in sel:
-            summarize_one(cfg, summary, filtered_experiments)
+            summarize_one(cfg, summary, filtered_experiments, backend)
             sel.remove(summary['name'])
 
     for s in sel:
