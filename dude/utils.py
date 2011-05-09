@@ -167,10 +167,10 @@ class IndentedHelpFormatterWithNL(optparse.IndentedHelpFormatter):
             for para in help_text.split("\n"):
                 help_lines.extend(textwrap.wrap(para, self.help_width))
                 # Everything is the same after here
-                result.append("%*s%s\n" % (
-                        indent_first, "", help_lines[0]))
-                result.extend(["%*s%s\n" % (self.help_position, "", line)
-                               for line in help_lines[1:]])
+            result.append("%*s%s\n" % (
+                    indent_first, "", help_lines[0]))
+            result.extend(["%*s%s\n" % (self.help_position, "", line)
+                           for line in help_lines[1:]])
         elif opts[-1] != "\n":
             result.append("\n")
         return "".join(result)
