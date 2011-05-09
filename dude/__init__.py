@@ -7,6 +7,7 @@ __version__ = '2.2'
 import args
 import clean
 import core
+import dimensions
 import execute
 import expgen
 import filter

@@ -122,6 +122,9 @@ if __name__ == '__main__':
                print "arguments to Dudefile:", margs
                dude.args.set_args(e, margs)
 
+          if hasattr(e, 'dude_version') and e.dude_version >= 3:
+               dude.dimensions.update(e)
+
           # TODO: the selection of experiments and how that interact with the commands should be redone.
           # the last parameter to filter_experiments include or exclude the not yet run experiments
 

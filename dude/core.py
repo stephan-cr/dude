@@ -185,4 +185,4 @@ def check_cfg(cfg):
     assert hasattr(cfg, 'raw_output_dir')
 
     assert hasattr(cfg, 'dude_version')
-    assert getattr(cfg, 'dude_version') == 2
+    assert getattr(cfg, 'dude_version') >= 2

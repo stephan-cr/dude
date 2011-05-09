@@ -87,7 +87,7 @@ def read_default(cfg, dimensions, text):
 
     return default_values
 
-def update(cfg, runs):
+def update(cfg):
     '''
     updates dimensions when a change in the definition of dimensions
     is detected
