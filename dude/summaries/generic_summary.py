@@ -91,13 +91,14 @@ class FilesLineSelect:
         for fn in files:
             f = open(fn)
             lines_offset = 1 if self.has_header else 0
+            fname_split = self.fname_split(fn)
             skip = lines_offset
             for l in f:
                 if skip > 0:
                     skip -= 1
                 else:
                     if re_prog.match(l):
-                        print >>summary, s + self.fname_split(fn) + ' ' + self.split(l[:-1])
+                        print >>summary, s + fname_split + ' ' + self.split(l[:-1])
             f.close()
 
     def as_dict(self, cfg):
