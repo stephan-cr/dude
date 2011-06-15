@@ -93,6 +93,6 @@ def filter_inline(cfg, filters, invert, only_ran=True):
 def check(cfg):
     """ """
     # check if the filters really exist
-    assert has_attr(cfg, 'filters')
+    assert hasattr(cfg, 'filters')
     assert type(cfg.filters) == dict
-    assert has_attr(cfg, 'optspace')
+    assert hasattr(cfg, 'optspace')
