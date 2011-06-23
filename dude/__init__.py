@@ -1,11 +1,21 @@
-# Copyright (c) 2010 Diogo Becker
-# Distributed under the MIT License
-# See accompanying file LICENSE
+"""
+    dude
+    ~~~~
 
-__version__ = '2.2'
+    experimentation framework.
+    
+    :copyright: Copyright 2010-2011 Diogo Becker.
+    :license: MIT, see LICENSE for details.
+"""
+
+__version__ = '2.3'
+__author__ = 'Diogo Becker'
+__copyright__ ='2010, 2011'
+
 
 import args
 import clean
+import cmdline
 import core
 import dimensions
 import execute
