@@ -334,31 +334,37 @@ def run(cfg, experiments, options):
             sys.exit(1)
 
     if options.global_only:
-        return
+        # print initial info
+        info.print_exp_simple(1, total_runs, missing_runs)
 
-    # print initial info
-    info.print_exp_simple(1, total_runs, missing_runs)
+        # execution loop
+        for i in range(0, len(experiments)):
+            run,experiment = experiments[i]
+            # One more run
+            actual_runs += 1
+            # Execute the measurement
+            exp_cpy = experiment.copy()
+            (executed, etime) = execute(cfg, exp_cpy, run, options.show_output)
 
-    # execution loop
-    for i in range(0, len(experiments)):
-        run,experiment = experiments[i]
-        # One more run
-        actual_runs += 1
-        # Execute the measurement
-        exp_cpy = experiment.copy()
-        (executed, etime) = execute(cfg, exp_cpy, run, options.show_output)
+            if executed:
+                executed_runs += 1
 
-        if executed:
-            executed_runs += 1
+            # Add elapsed time to mean object
+            elapsed_time.add(etime)
+                
+            # Calculate the total time
+            t_actual = tc()
 
-        # Add elapsed time to mean object
-        elapsed_time.add(etime)
+            # Print some time information
+            info.print_exp(actual_runs, executed_runs, missing_runs, total_runs, t_actual - t_start, elapsed_time)
+    # end not global_only
 
-        # Calculate the total time
-        t_actual = tc()
-
-        # Print some time information
-        info.print_exp(actual_runs, executed_runs, missing_runs, total_runs, t_actual - t_start, elapsed_time)
+    if hasattr(cfg, 'finish_global') and not options.skip_global:
+        try :
+            cfg.finish_global()
+        except KeyboardInterrupt, e :
+            print "Interrupted on finish_global()"
+            sys.exit(1)
 
 def check_cfg(cfg):
     assert hasattr(cfg, 'runs')
