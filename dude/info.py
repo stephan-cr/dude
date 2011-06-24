@@ -5,6 +5,7 @@
 """!!"""
 import utils
 import core
+import os
 
 class PBar:
     """
@@ -36,8 +37,9 @@ class PBar:
 
 def show_info(cfg, optspace = {}, run = 0, folder = None):
     if optspace == {}:
+        name = cfg.name if hasattr(cfg, 'name') else os.getcwd()
         print '----------------------------------'
-        print 'Experiment', cfg.name
+        print 'Experiment', name
         print '----------------------------------'
         print 'Options :'
         for k in cfg.optspace.keys():
@@ -106,10 +108,15 @@ def print_exp_simple(actual_runs, total_runs, missing_runs):
                                                 missing_runs)
     print "====", runs, "===="
 
-def print_elapsed(cfg, elapsed):
+def print_elapsed(timeout, elapsed, last_elapsed = None):
     b = PBar(20)
-    p = elapsed * 1000 / cfg.timeout * 100
+    p = elapsed * 1000 / timeout * 100
     p /= 1000
-    b.fill(p)
-    print b, "\telapsed: %d" % (int(elapsed)), "seconds", " " + chr(27) + '[A'
+
+    if (p > 100) or (p < 0): 
+        b.fill(100)
+        print b, "\ttime out!!                  "
+    else:
+        b.fill(p)
+        print b, "\telapsed: %d" % (int(elapsed)), "seconds", " " + chr(27) + '[A'
 
