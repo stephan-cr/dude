@@ -333,7 +333,7 @@ def run(cfg, experiments, options):
             print "Interrupted on prepare_global()"
             sys.exit(1)
 
-    if options.global_only:
+    if not options.global_only:
         # print initial info
         info.print_exp_simple(1, total_runs, missing_runs)
 
