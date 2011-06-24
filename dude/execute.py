@@ -18,232 +18,151 @@ from threading import Timer
 tc = time.time
 
 
-catch_sigint = False
-global_cfg = None
+class SpawnProcess:
+    """Run experiment in a subprocess"""
+    def __init__(self, func, optpt, stdout, stderr):
+        self.proc   = None
+        self.status = None
+        self.func   = func
+        self.optpt  = optpt
+        self.stdout = stdout
+        self.stderr = stderr
+        
+    def kill(self):
+        self.proc.kill()
+        self.status = self.proc.wait()
+        self.proc = None
+        
+    def poll(self):
+        if self.status: 
+            return True
 
+        assert self.proc != None
+        retcode = self.proc.poll()
+        if retcode != None:
+            self.status = retcode
+            return True
+        else:
+            return False
 
-# there are two ways how to start an experiment.
-# Either with a spawn or with a fork
-gproc = None
-gpid  = None
-fd    = None
+    def start(self):
+        self.proc = subprocess.Popen(self.func(self.optpt),
+                                     shell = True,
+                                     stderr = self.stdout,
+                                     stdout = self.stderr)
 
+class ForkProcess:
+    """Fork process and start a experiment."""
+    def __init__(self, func, optpt, stdout, stderr):
+        self.pid    = None
+        self.status = None
+        self.func   = func
+        self.optpt  = optpt
+        self.stdout = stdout
+        self.stderr = stderr
+        
+    def kill(self):
+        assert self.pid != os.getpid()
 
+        os.kill(self.pid, signal.SIGINT)
+        (npid, status) = os.waitpid(self.pid, 0)
+        self.pid = None
+        # print "return code was : ", status
+        self.status = status
 
-def keyint_handler():
-    """Stops the experiment and asks if it should stop the complete set of experiments or not"""
-    signal.signal(signal.SIGINT, signal.SIG_IGN)
-    status = 1
-    if gproc != None:
-        proc.wait()
-        print "return code was : ", proc.poll()
-        if hasattr(global_cfg, 'on_kill'):
-            global_cfg.on_kill(None)
+    def poll(self):
+        if self.status:
+            return True
 
-    if gpid != None:
-        print "waiting dude child"
-        os.kill(gpid, signal.SIGINT)
-        (npid, status) = os.waitpid(gpid, 0)
-        print "return code was : ", status
-        if hasattr(global_cfg, 'on_kill'):
-            global_cfg.on_kill(None)
+        assert self.pid != None
+        (npid, status) = os.waitpid(self.pid, os.WNOHANG)
+        if (npid, status) == (0,0):
+            return False
+        else:
+            print status, npid, self.pid
+            self.status = status
+            return True
 
-    print "Quitting... ", gpid
-    exit(status)
+    def start(self):
+        self.pid = os.fork()
+        if self.pid == 0:
+            self.__child()
+            # should exit in __execute_child
+            assert False 
 
-
-def kill_on_timeout(cfg, proc):
-    """Kills experiment processes on timeout"""
-    print "Killing experiment"
-    proc.send_signal(signal.SIGKILL)
-    if hasattr(cfg, 'on_timeout'):
-        cfg.on_kill(proc)
-
-def kill_pid(pid, callback):
-    """Kill process and execute callback."""
-    print "Killing experiment"
-
-    try:
-        os.kill(pid, signal.SIGTERM)
-    except:
-        pass
-    if callback: callback()
-
-def fork_experiment(cfg, optpt, timeout, fname, show_output = True):
-    """Fork process and start a experiment. The global variable gpid
-    will be set with the child process. """
-    global gpid, fd
-
-    # stdout of the process will redirected to file
-    f = open(fname,'w')
-
-    # create a pipe to communicate
-    r, w = os.pipe()
-
-    gpid = os.fork()
-    if gpid:
-        # is there a callback in the cfg?
-        callback = None
-        if hasattr(cfg, 'on_timeout'):
-            callback = lambda optpt: cfg.on_timeout(optpt)
-
-        signal.signal(signal.SIGINT, lambda num, frame: keyint_handler())
-
-        # start killer
-        killer = Timer(timeout, kill_pid, [gpid, callback])
-        killer.start()
-
-        os.close(w) # use os.close() to close a file descriptor
-        #fr = os.fdopen(r) # turn r into a file object
-        fr = open(fname, 'r')
-        fd = fr.fileno()
-        fl = fcntl.fcntl(fd, fcntl.F_GETFL)
-        fcntl.fcntl(fd, fcntl.F_SETFL, fl | os.O_NONBLOCK)
-
-        start_time = time.time()
-        status = 1
-        done = False
-        while True:
-            try:
-                line = fr.readline()
-                if line:
-                    if show_output:
-                        print line.rstrip()
-                    else:
-                        break
-                    #print >>f, line.rstrip()
-                else:
-                    raise IOError('empty line!')
-            except IOError, e:
-                if done:
-                    break
-
-            if not done:
-                (npid, status) = os.waitpid(gpid, os.WNOHANG)
-                #print npid, status
-                if (npid, status) != (0,0):
-                    done = True
-
-                elapsed = time.time() - start_time
-                if elapsed > 5:
-                    time.sleep(5)
-                    elapsed = time.time() - start_time
-                    info.print_elapsed(cfg, elapsed)
-
-        killer.cancel()
-        f.close()
-        fr.close()
-        #gpid = None
-        return status
-    else:
-        # we are the child
-        def bahm():
-            print "bahm bahm baaahm"
-            sys.exit(1)
-        signal.signal(signal.SIGINT, lambda num, frame: bahm())
-        gpid = None
-        os.close(r)
-        w = os.fdopen(w, 'w')
-        sys.stdout = f
-        sys.stderr = f
+    def __child(self):
+        # def bahm():
+        #     print "bahm bahm baaahm"
+        #     sys.exit(1)
+        # signal.signal(signal.SIGINT, lambda num, frame: bahm())
+        sys.stdout = self.stdout
+        sys.stderr = self.stderr
+    
         print "dude: child start"
-        timeout = 2 # seconds
-        t = None
-        def flushit(t):
-            t = Timer(timeout, flushit, [t])
-            t.start()
-            f.flush()
-        t = Timer(timeout, flushit, [t])
         try:
-            ret = cfg.exp(optpt)
+            ret = self.func(self.optpt)
+        except KeyboardInterrupt, e:
+            sys.exit(-1)
         except Exception, e:
-            print e
             sys.exit(1)
-        print "dude: child exit"
-        f.flush()
-        t.cancel()
-        w.flush()
-        w.close()
+        if ret == None:
+            ret = 0
         sys.exit(ret)
 
-def run_program(cfg, cmd, timeout, fname, show_output = True):
-    """Run experiment in a subprocess"""
+def kill_proc(cfg, proc):
+    """Stops the experiment and asks if it should stop the complete set of experiments or not"""
+    proc.kill()
+    if hasattr(cfg, 'on_kill'):
+        cfg.on_kill(None)
 
-    f = open(fname,'w')
-    fr = open(fname,'r')
+def execute_one(cfg, optpt, stdout, stderr):
+    """Run experiment in a child process. Kill process on timeout or keyboard interruption."""
 
-    # shell=False, bufsize=0
-    p = subprocess.Popen(cmd, shell=True,
-                         stderr=f,
-                         stdout=f)
-    set_catcher(p)
-    global_cfg = cfg
-    t = Timer(timeout, kill_on_timeout, [cfg, p])
-    t.start()
+    timeout = cfg.timeout
 
-    retcode = None
+    if hasattr(cfg, 'cmdl_exp'):
+        proc = SpawnProcess(cfg.cmdl_exp, optpt, stdout, stderr)
+    else:
+        assert hasattr(cfg, 'fork_exp')
+        proc = ForkProcess(cfg.fork_exp, optpt, stdout, stderr)
 
-    # make stdout of process non-blocking
+    killer = Timer(timeout, kill_proc, [cfg, proc])
+        
+    try:
+        # start process
+        proc.start()
+        
+        # start timer after starting process. That is important
+        # otherwise a forked process gets the timer as well.
+        killer.start()
 
-    fd = fr.fileno() # p.stdout.fileno()
-    fl = fcntl.fcntl(fd, fcntl.F_GETFL)
-    fcntl.fcntl(fd, fcntl.F_SETFL, fl | os.O_NONBLOCK)
-
-    start_time = time.time()
-    while True:
+        start_time = time.time()
+        elapsed = 0
         while True:
-            try:
-                line = fr.readline()
-                if line != '':
-                    if show_output:
-                        print ">>> " + line.rstrip()
-                else:
-                    break
-            except IOError, e:
-                pass
-
-        retcode = p.poll()
-        if retcode != None:
-            break
-
-        time.sleep(5 if cfg.timeout > 5 else cfg.timeout / 5.0)
-        elapsed = time.time() - start_time
-        info.print_elapsed(cfg, elapsed)
-
-    while True:
-        try:
-            line = fr.readline()
-            if line != '':
-                if show_output:
-                    print ">>> " + line.rstrip()
-            else:
+    
+            if proc.poll():
+                retcode = proc.status
+                info.print_elapsed(timeout, elapsed)
+                print
                 break
-        except IOError, e:
-            break
 
-    t.cancel()
-    f.close()
-    fr.close()
+            time.sleep(0.01 if elapsed < 5 else 5.0)
+            elapsed = time.time() - start_time
+            if elapsed >= 5 and elapsed < timeout:
+                info.print_elapsed(timeout, elapsed)
+
+    except KeyboardInterrupt, e:
+        print
+        kill_proc(cfg, proc)
+        raise e
+    finally:
+        killer.cancel()
+
     return retcode
 
-def init():
-    # catch CTRL-C
-    catch_sigint = True
-    set_catcher(None)
-
-def set_catcher(proc):
-    # catch CTRL-C
-    if catch_sigint:
-        signal.signal(signal.SIGINT, lambda num, frame: sig_handler(num,frame,proc) )
-
-
-def execute_safe(cfg, optpt, run, show_output, folder = None):
-    """Executes one experiment configuration for a run"""
+def execute_isolated(cfg, optpt, run, show_output = False, folder = None):
+    """Executes one experiment in a separate folder"""
     start = tc()
-
-    cmd = None
-    if hasattr(cfg, 'cmdl_exp'):
-        cmd = cfg.cmdl_exp(optpt)
 
     e_start = e_end = 0
 
@@ -273,26 +192,30 @@ def execute_safe(cfg, optpt, run, show_output, folder = None):
         cfg.prepare_exp(optpt)
 
     e_start = tc()
-    # decide whether to call run_program or fork_experiment
-    if cmd != None:
-        s = run_program(cfg, cmd, cfg.timeout, core.outputFile, show_output)
-    else:
-        s = fork_experiment(cfg, optpt, cfg.timeout, core.outputFile, show_output)
-    e_end = tc()
+    try:
+        fout = open(core.outputFile, 'w')
+        s = -1
+        s = execute_one(cfg, optpt, fout, fout)
+    
+        if s != 0:
+            print 'command returned error value: %d' % s
 
-    if s != 0:
-        print 'command returned error value: %d' % s
+    finally:
+        e_end = tc()
+        if fout: fout.close()
 
-    f = open(core.statusFile,'w')
-    f.write(str(s))
-    f.close()
+        f = open(core.statusFile,'w')
+        f.write(str(s))
+        f.close()
 
-    # call prepare experiment
-    if hasattr(cfg, 'finish_exp'):
-        cfg.finish_exp(optpt)
+        print "status .. ", s
 
-    # go back to working dir
-    os.chdir(wd)
+        # call prepare experiment
+        if hasattr(cfg, 'finish_exp'):
+            cfg.finish_exp(optpt, s)
+
+        # go back to working dir
+        os.chdir(wd)
 
     # return the time used
     end = tc()
@@ -301,9 +224,8 @@ def execute_safe(cfg, optpt, run, show_output, folder = None):
     return (True, (end-start))
 
 def execute(cfg, optpt, run, show_output, folder = None):
-    signal.signal(signal.SIGINT, signal.SIG_DFL)
     try:
-        return execute_safe(cfg, optpt, run, show_output, folder)
+        return execute_isolated(cfg, optpt, run, show_output, folder)
     except KeyboardInterrupt, e:
         print e
         return (False, 0)

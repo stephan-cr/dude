@@ -1,12 +1,12 @@
+# Copyright (c) 2011 Diogo Becker
+# Distributed under the MIT License
+# See accompanying file LICENSE
+
 """
-    cmdline
-    ~~~~~~~
+cmdline
+~~~~~~~
 
-    Command line interface.
-
-    :copyright: Copyright (c) 2011 Diogo Becker
-    :license: MIT, see LICENSE for details.
-
+Command line interface.
 """
 from dude import __version__
 
@@ -164,14 +164,12 @@ def main(cargs):
 
      cmd = cargs[0]
      if cmd == 'run':
-          execute.init()
           if options.force:
                clean.clean_experiments(cfg, experiments)
           execute.run(cfg, experiments, options)
      elif cmd == 'run-once':
           assert len(experiments) == 1
           optpt =  experiments[0][1]
-          execute.init()
           folder = "once"
           utils.checkFolder(folder) # create if necessary
           if options.force:
