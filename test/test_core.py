@@ -4,7 +4,7 @@ import dude.core
 
 class CFGMock:
     constraints = [lambda x: True]
-    options = {'a' : [1, 2], 'b' : [2, 3]}
+    optspace = {'a' : [1, 2], 'b' : [2, 3]}
 
 class CoreTestCase(unittest.TestCase):
     def test_get_experiments(self):
@@ -28,7 +28,6 @@ class CoreTestCase(unittest.TestCase):
 
     def test_check_cfg(self):
         cfg = CFGMock()
-        cfg.name = 'Foo'
         cfg.raw_output_dir = 'raw'
-        cfg.dude_version = 2
+        cfg.dude_version = 3
         dude.core.check_cfg(cfg)
