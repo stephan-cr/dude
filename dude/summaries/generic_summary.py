@@ -1,4 +1,4 @@
-# Copyright (c) 2010 Diogo Becker, Stephan Creutz
+# Copyright (c) 2010, 2011 Diogo Becker, Stephan Creutz
 # Distributed under the MIT License
 # See accompanying file LICENSE
 
@@ -37,7 +37,7 @@ class LineSelect:
     def as_dict(self, cfg):
         s = {
             'name' : self.name,
-            'dimensions' : cfg.options.keys(),
+            'dimensions' : cfg.optspace.keys(),
             'groupby' : self.groupby,
             'process' : lambda a,b,c,d: LineSelect.proc(self, a, b, c, d)
             }
@@ -104,7 +104,7 @@ class FilesLineSelect:
     def as_dict(self, cfg):
         s = {
             'name' : self.name,
-            'dimensions' : cfg.options.keys(),
+            'dimensions' : cfg.optspace.keys(),
             'groupby' : self.groupby,
             'process' : lambda a,b,c,d: FilesLineSelect.proc(self, a, b, c, d)
             }
@@ -171,7 +171,7 @@ class MultiLineSelect:
     def as_dict(self, cfg):
         s = {
             'name' : self.name,
-            'dimensions' : cfg.options.keys(),
+            'dimensions' : cfg.optspace.keys(),
             'groupby' : self.groupby,
             'process' : lambda a,b,c,d: MultiLineSelect.proc(self, a, b, c, d)
             }
@@ -242,7 +242,7 @@ class FilesMultiLineSelect:
     def as_dict(self, cfg):
         s = {
             'name' : self.name,
-            'dimensions' : cfg.options.keys(),
+            'dimensions' : cfg.optspace.keys(),
             'groupby' : self.groupby,
             'process' : lambda a,b,c,d: FilesMultiLineSelect.proc(self, a, b, c, d)
             }

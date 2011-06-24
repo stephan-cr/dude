@@ -34,14 +34,14 @@ class PBar:
         return "".join(out)
 
 
-def show_info(cfg, options = {}, run = 0, folder = None):
-    if options == {}:
+def show_info(cfg, optspace = {}, run = 0, folder = None):
+    if optspace == {}:
         print '----------------------------------'
         print 'Experiment', cfg.name
         print '----------------------------------'
         print 'Options :'
-        for k in cfg.options.keys():
-            print '%8s' % (k), '=', cfg.options[k]
+        for k in cfg.optspace.keys():
+            print '%8s' % (k), '=', cfg.optspace[k]
         print 'Runs    :', str(cfg.runs)
         if len(cfg.constraints) == 0:
             print 'Samples : complete space'
@@ -67,13 +67,13 @@ def show_info(cfg, options = {}, run = 0, folder = None):
     else:
         print
         print 'Experiment: '
-        for k in options.keys():
-            print '%8s' % (k), '=', options[k]
+        for k in optspace.keys():
+            print '%8s' % (k), '=', optspace[k]
         if folder == None:
-            folder = core.get_folder(cfg, options, run)
+            folder = core.get_folder(cfg, optspace, run)
         print '%8s' %('CWD'), '=', folder
         if hasattr(cfg, 'get_cmd'):
-            print '%8s' %('CMD'), '=', cfg.get_cmd(options)
+            print '%8s' %('CMD'), '=', cfg.get_cmd(optspace)
 
 
 def print_run(actual_runs, status, experiment_elapsed_time):

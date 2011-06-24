@@ -16,7 +16,7 @@ class MetaData:
     '''mimics an 'cfg' object which can be pickled'''
 
     def __init__(self, cfg):
-        self.options = cfg.options
+        self.optspace = cfg.optspace
         self.runs = cfg.runs if hasattr(cfg, 'runs') else 1
         self.raw_output_dir = cfg.raw_output_dir
 
@@ -32,7 +32,7 @@ class MetaData:
         os.rename(raw_folder + '/meta.tmp', raw_folder + '/meta')
 
     def __str__(self):
-        return ', '.join([str(attr) for attr in [self.options, self.runs,
+        return ', '.join([str(attr) for attr in [self.optspace, self.runs,
                                                  self.raw_output_dir]])
 
 def read_meta(cfg):
@@ -80,9 +80,9 @@ def read_default(cfg, dimensions, text):
     default_values = {}
     for dim in dimensions:
         value = raw_input(text + ' "' + str(dim) + '" ' + \
-                              str(cfg.options[dim]) + ': ')
-        casted_value = type(cfg.options[dim][0])(value)
-        assert casted_value in cfg.options[dim]
+                              str(cfg.optspace[dim]) + ': ')
+        casted_value = type(cfg.optspace[dim][0])(value)
+        assert casted_value in cfg.optspace[dim]
         default_values[dim] = casted_value
 
     return default_values
@@ -96,12 +96,12 @@ def update(cfg):
     saved_meta_data = read_meta(cfg)
 
     if saved_meta_data is not None:
-        cfg.options.keys().sort()
+        cfg.optspace.keys().sort()
 
-        additional_dimensions = list_difference(cfg.options.keys(),
-                                                saved_meta_data.options.keys())
-        removed_dimensions = list_difference(saved_meta_data.options.keys(),
-                                             cfg.options.keys())
+        additional_dimensions = list_difference(cfg.optspace.keys(),
+                                                saved_meta_data.optspace.keys())
+        removed_dimensions = list_difference(saved_meta_data.optspace.keys(),
+                                             cfg.optspace.keys())
 
         if len(additional_dimensions) > 0 or len(removed_dimensions) > 0:
             add_default_values = {}

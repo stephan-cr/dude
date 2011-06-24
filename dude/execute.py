@@ -242,8 +242,8 @@ def execute_safe(cfg, optpt, run, show_output, folder = None):
     start = tc()
 
     cmd = None
-    if hasattr(cfg, 'get_cmd'):
-        cmd = cfg.get_cmd(optpt)
+    if hasattr(cfg, 'cmdl_exp'):
+        cmd = cfg.cmdl_exp(optpt)
 
     e_start = e_end = 0
 
@@ -374,6 +374,6 @@ def check_cfg(cfg):
     assert type(cfg.constraints) == list
     assert hasattr(cfg, 'raw_output_dir')
     assert hasattr(cfg, 'prepare_exp')
-    assert hasattr(cfg, 'get_cmd') or hasattr(cfg, 'exp')
-    assert not (hasattr(cfg, 'get_cmd') and hasattr(cfg, 'exp'))
+    assert hasattr(cfg, 'cmdl_exp') or hasattr(cfg, 'exp')
+    assert not (hasattr(cfg, 'cmdl_exp') and hasattr(cfg, 'exp'))
     assert hasattr(cfg, 'timeout')

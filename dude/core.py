@@ -1,4 +1,4 @@
-# Copyright (c) 2010 Diogo Becker
+# Copyright (c) 2010, 2011 Diogo Becker
 # Distributed under the MIT License
 # See accompanying file LICENSE
 
@@ -16,7 +16,7 @@ outputFile = 'dude.output'
 def get_experiments(cfg):
     """Creates a list of experiments."""
     # TODO: sampling
-    exps = utils.cartesian(cfg.options)
+    exps = utils.cartesian(cfg.optspace)
     if hasattr(cfg, 'constraints'):
         for c in cfg.constraints:
             exps_tmp = []
@@ -42,15 +42,15 @@ def get_raw_folder(cfg):
     utils.checkFolder(folder)
     return folder
 
-def get_name(prefix, options):
-    """Given a prefix, and an experiment (options), creates the a string to
+def get_name(prefix, optspace):
+    """Given a prefix, and an experiment (optspace), creates the a string to
     identify the experiment."""
     s = prefix
-    l = options.keys()
+    l = optspace.keys()
     l.sort()
     for k in l:
         s += SEP + k
-        st=''.join(str(options[k]).split(' '))
+        st=''.join(str(optspace[k]).split(' '))
         s+=''.join(st.split('/'))
     return  s
 
@@ -163,26 +163,24 @@ def success_count(cfg, run_experiments):
             c += 1
     return c
 
-
 def check_cfg(cfg):
     """ Verifies if loaded configuration file has fields necessary for this module."""
-    assert hasattr(cfg, 'name')
-    if hasattr(cfg, 'optspace'):
-        assert not hasattr(cfg, 'options')
-        cfg.options = cfg.optspace
-    elif hasattr(cfg, 'options'):
-        cfg.optspace = cfg.options
-    assert type(cfg.options) == dict
+    assert hasattr(cfg, 'dude_version')
+    assert getattr(cfg, 'dude_version') >= 3
 
-    assert not cfg.options.has_key('run')
+    if not hasattr(cfg, 'name'):
+        setattr(cfg, 'name', os.getcwd())
+
+    assert hasattr(cfg, 'optspace')
+    assert type(cfg.optspace) == dict
+
     if hasattr(cfg, 'constraints'):
         assert type(cfg.constraints) == list
     else:
         cfg.constraints = []
 
-    assert not hasattr(cfg, 'runs') or type(cfg.runs) == int
-
     assert hasattr(cfg, 'raw_output_dir')
 
-    assert hasattr(cfg, 'dude_version')
-    assert getattr(cfg, 'dude_version') >= 2
+    # TODO remove
+    cfg.runs = 1
+    cfg.timeout = 100

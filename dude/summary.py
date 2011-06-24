@@ -1,13 +1,17 @@
-# Copyright (c) 2010 Diogo Becker
+# Copyright (c) 2010, 2011 Diogo Becker
 # Distributed under the MIT License
 # See accompanying file LICENSE
 
-""" """
+"""
+Methods to collect results from experiments (in expfolders),
+processing them, and writting the summaries out.
+"""
 
 import os
 
 import core
 import summary_backends
+import summaries
 import utils
 
 def preprocess_one(cfg, s):
@@ -34,10 +38,10 @@ def summarize_one(cfg, s, filtered_experiments, backend):
         experiments.append(experiment)
 
     # group by X
-    options = {}
-    for k in s['groupby']: # select the right options
-        options[k] = cfg.options[k]
-    groups = utils.groupBy(experiments, options)
+    optspace = {}
+    for k in s['groupby']: # select the right optspace
+        optspace[k] = cfg.optspace[k]
+    groups = utils.groupBy(experiments, optspace)
 
     # create summary output directory if necessary
     utils.checkFolder(cfg.sum_output_dir)
@@ -51,12 +55,12 @@ def summarize_one(cfg, s, filtered_experiments, backend):
     # for each group, call process of s
     for (group, elements) in groups:
         print "Group: ", group, " entries:", len(elements)
-        options = {}
+        optspace = {}
         for i in s['dimensions']:
-            options[i] = cfg.options[i]
+            optspace[i] = cfg.optspace[i]
 
         # get experiments that match ?????
-        space = utils.groupBy(elements, options)
+        space = utils.groupBy(elements, optspace)
 
         oFile = cfg.sum_output_dir + '/' + core.get_name(s['name'], group)
 
@@ -65,7 +69,7 @@ def summarize_one(cfg, s, filtered_experiments, backend):
         cols = s['dimensions'] + other_cols
         cols_sz = []
         for dimension in s['dimensions']:
-            lengths = map(lambda x: len(str(x)), options[dimension])
+            lengths = map(lambda x: len(str(x)), optspace[dimension])
             lengths.append(len(dimension))
             cols_sz.append(max(lengths))
         cols_sz += map(len, other_cols)
@@ -130,9 +134,17 @@ def summarize(cfg, filtered_experiments, sel = [], backend = 'file'):
         print s, "not valid"
 
 def check_cfg(cfg):
+    assert hasattr(cfg, 'dude_version')
+    assert getattr(cfg, 'dude_version') >= 3
+
+    assert hasattr(cfg, 'optspace')
     assert hasattr(cfg, 'sum_output_dir')
-    assert hasattr(cfg, 'summaries')
-    assert type(cfg.summaries) == list
+
+    if not hasattr(cfg, 'summaries'):
+        cfg.summaries = [summaries.LineSelect('default')]
+    else:
+        assert type(cfg.summaries) == list
+
     summ = []
     for s in cfg.summaries:
         if type(s) == dict:
