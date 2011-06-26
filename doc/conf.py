@@ -21,7 +21,7 @@ from dude import __author__
 from dude import __version__
 from dude import __copyright__
 
-__version__ = 3.0
+__version__ = "3.0"
 __copyright__ = "2011"
 
 # -- General configuration -----------------------------------------------------

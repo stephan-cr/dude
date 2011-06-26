@@ -108,7 +108,36 @@ Once an experiment is finished, either correctly or by crashing, its results gen
 Summaries
 ---------
 
-TBD
+Dude can collect, filter, aggregate any information from the experiments.
+For that the user simply invokes Dude as follows:
+
+.. code-block:: console
+
+  examples/echo$ dude sum
+
+
+By default, Dude simply concatenates the output to the stdout of every experiment into the file ``output/default``.
+After calling ``dude run``, the user can access this file with any program to further process or plot this data, for example:
+ 
+.. code-block:: console
+
+  examples/echo$ cat output/default 
+
+  1024 10 buffer_size=1024 timeout=10
+  1024 50 buffer_size=1024 timeout=50
+  1024 100 buffer_size=1024 timeout=100
+  2048 10 buffer_size=2048 timeout=10
+  2048 50 buffer_size=2048 timeout=50
+  2048 100 buffer_size=2048 timeout=100
+  4096 10 buffer_size=4096 timeout=10
+  4096 50 buffer_size=4096 timeout=50
+  4096 100 buffer_size=4096 timeout=100
+
+
+Other ``summary`` objects can be added directly to the Dudefile::
+      
+      import dude.summaries
+      summaries = [ dude.summaries.LineSelect('stdout') ]  
 
 
 From optpts to configuration files
