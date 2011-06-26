@@ -57,13 +57,8 @@ parser.add_option("-a", "--args",
                   dest = "margs", metavar = "ARGS",
                   help = "arguments to Dudefile separated by semicolons"
                   "\ne.g. -a \"option1=value;option2=[value3,value4]\"")
-parser.add_option("--dry", default = False,
-                  dest = "dry", action = "store_true",
-                  help = "dry run (sets global dry variable to True)")
+
 group2 = optparse.OptionGroup(parser, 'run specific options')
-group2.add_option("-n","--no-output", action = "store_false",
-                  dest = "show_output", default = True,
-                  help = "omit the output of experiment")
 group2.add_option("--force", action = "store_true",
                   dest = "force", default = False,
                   help = "force execution")
@@ -137,39 +132,33 @@ def main(cargs):
      # check if cfg can be used for summaries
      summary.check_cfg(cfg)
 
-     # set dry run variable
-     if options.dry:
-          cfgdry = True
-     else:
-          cfgdry = False
-
      # parse arguments to module
      if options.margs:
           margs = args.parse(options.margs)
-          print "arguments to Dudefile:", margs
+          print "Passing arguments:", margs
           args.set_args(cfg, margs)
 
      if hasattr(cfg, 'dude_version') and cfg.dude_version >= 3:
           dimensions.update(cfg)
 
-     experiments = core.get_experiments(cfg)
-     print experiments
-     # select only those that were successful?
-     # TODO: the selection of experiments and how that interact with the commands should be redone.
-     # the last parameter to filter_experiments include or exclude the not yet run experiments
-
+     # show_output is always true, but it has no effect 
+     # TODO: remove this option completely
+     options.show_output = True
+     
      experiments = []
      if options.filter != None:
           filters = []
           for f in options.filter.split(','):
                filters.append(cfg.filters[f])
-          experiments = filt.filter_experiments(cfg, filters, options.invert, True)
+          experiments = filt.filter_experiments(cfg, filters, 
+                                                options.invert, True)
      elif options.filter_inline:
-          experiments = filt.filter_inline(cfg, options.filter_inline, options.invert, False)
+          experiments = filt.filter_inline(cfg, 
+                                           options.filter_inline,
+                                           options.invert, False)
      else:
           experiments = core.get_experiments(cfg)
-
-
+     
      cmd = cargs[0]
      if cmd == 'run':
           if options.force:
@@ -184,7 +173,8 @@ def main(cargs):
                clean.clean_experiment(folder)
           execute.execute(cfg, optpt, 1, options.show_output, folder)
      elif cmd == 'sum':
-          summary.summarize(cfg, experiments, cargs[1:], options.backend, options.ignore_status)
+          summary.summarize(cfg, experiments, cargs[1:], 
+                            options.backend, options.ignore_status)
      elif cmd == 'list':
           for experiment in experiments:
                if options.dict:
@@ -199,15 +189,15 @@ def main(cargs):
           failed = core.get_failed(cfg, True)
           for exp in failed:
                print exp
-     elif cmd == 'force-fail':
-          print "ERROR: Command not implemented!"
-          sys.exit(1)
      elif cmd == 'clean':
-          # TODO if no filter applied, ask if that's really what the user wants.
+          # TODO if no filter applied, ask if that's really what the
+          # user wants.
           r = 'y'
-          if options.filter == None and options.filter_inline == None:
+          if options.filter == None and\
+                   options.filter_inline == None:
                print "sure to wanna delete everything? [y/N]"
-               r = utils.getch() #raw_input("Skip, quit, or continue? [s/q/c]")
+               r = utils.getch() #raw_input("Skip, quit, or continue?
+                                 #[s/q/c]")
 
           if r == 'y':
                clean.clean_experiments(cfg, experiments)
