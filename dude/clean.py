@@ -8,8 +8,8 @@ import shutil
 import os
 
 def clean_experiments(cfg, experiments):
-    for run,experiment in experiments:
-        folder = core.get_folder(cfg, experiment, run)
+    for experiment in experiments:
+        folder = core.get_folder(cfg, experiment)
         print "Cleaning", folder
         shutil.rmtree(folder)
 
