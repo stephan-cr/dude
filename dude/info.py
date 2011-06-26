@@ -9,7 +9,8 @@ import utils
 import core
 import os
 
-HEAD = '~'*80
+HEAD = '_'*80
+HEAD2 = '~'*80
 LINE = '-'*80
 
 class PBar:
@@ -43,47 +44,55 @@ class PBar:
 def show_info(cfg, optspace = {}, folder = None):
     if optspace == {}:
         name = cfg.name if hasattr(cfg, 'name') else os.getcwd()
-        print HEAD
-        print 'Experiment', name
+        print HEAD2
+        print 'Experiment set:', name
         print LINE
-        print 'Options :'
+        print 'Option space:'
         for k in cfg.optspace.keys():
-            print '%8s' % (k), '=', cfg.optspace[k]
+            print '%20s' % (k), '=', cfg.optspace[k]
         if len(cfg.constraints) == 0:
-            print 'Samples : complete space'
+            print 'Experiments: complete space'
         else:
-            print 'Samples : constrained space'
+            print 'Experiments: constrained space'
         print "Timeout :", cfg.timeout
         print LINE
         print 'Summaries:'
         for s in cfg.summaries:
             print '\t', s['name']
-        print LINE
         if hasattr(cfg, 'filters'):
             print 'Filters:'
             for f in cfg.filters:
                 print '\t', f
         else:
             print 'Filters: None'
+        print HEAD2
         print
     else:
-        print
-        print 'Experiment: '
-        for k in optspace.keys():
-            print '%8s' % (k), '=', optspace[k]
-        if folder == None:
-            folder = core.get_folder(cfg, optspace)
-        print '%8s' %('CWD'), '=', folder
-        if hasattr(cfg, 'get_cmd'):
-            print '%8s' %('CMD'), '=', cfg.get_cmd(optspace)
+        assert False
 
+def show_exp_info(cfg, experiment, folder, 
+                  executed_runs, missing_runs, total_runs):
+    print HEAD
+    print 'Experiment: %d of %d (total: %d)'  % (executed_runs,
+                                                 missing_runs,
+                                                 total_runs)  
+    print 'Folder :', folder
+    print 'Options:'
+    for k in experiment.keys():
+        print '%20s' % (k), '=', experiment[k]
+    if hasattr(cfg, 'get_cmd'):
+        print '%8s' %('CMD'), '=', cfg.get_cmd(experiment)
+    print LINE
 
 def print_run(actual_runs, status, experiment_elapsed_time):
-    print "Run %d status %d time %.4fs" % (actual_runs, status,
-                                           experiment_elapsed_time)
+    pass
+# print LINE
+    # print 'Status: %d'    % status
+    # print 'Time  : %.4fs' % experiment_elapsed_time
 
 def print_exp(actual_runs, executed_runs, missing_runs, total_runs,
               total_time, elapsed_time):
+    #print LINE
     remaining_time = elapsed_time.mean()*(missing_runs-executed_runs)
     if missing_runs == 0:
         percent_exec = 100.0
@@ -91,14 +100,10 @@ def print_exp(actual_runs, executed_runs, missing_runs, total_runs,
         percent_exec = float(executed_runs)/float(missing_runs)*100.0
 
     # strings
-    runs = "run %d of %d: remaining runs %d of %d (%.1f%%)" % (actual_runs, total_runs,
-                                                               missing_runs - executed_runs,
-                                                               missing_runs,
-                                                               percent_exec)
-    elapsed = "elapsed: %s" % utils.sec2string(total_time)
-    remaining = "remaining: %s" % utils.sec2string(remaining_time)
-
-    print "====", runs, elapsed, remaining, "===="
+    s  = "Completed: %.1f%%" % (percent_exec)
+    s += "\tElapsed  : %s" % utils.sec2string(total_time)
+    s += "\tRemaining: %s (estimated)" % utils.sec2string(remaining_time)
+    print s
 
 def print_exp_simple(actual_runs, total_runs, missing_runs):
     #percent_exec = 100*actual_runs/total_runs
@@ -109,6 +114,8 @@ def print_exp_simple(actual_runs, total_runs, missing_runs):
     print "====", runs, "===="
 
 def print_elapsed(timeout, elapsed, last_elapsed = None):
+    if timeout == None:
+        timeout = 10000
     b = PBar(20)
     p = elapsed * 1000 / timeout * 100
     p /= 1000

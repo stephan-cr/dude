@@ -126,7 +126,7 @@ def execute_one(cfg, optpt, stdout, stderr):
         assert hasattr(cfg, 'fork_exp')
         proc = ForkProcess(cfg.fork_exp, optpt, stdout, stderr)
 
-    killer = Timer(timeout, kill_proc, [cfg, proc])
+    killer = Timer(timeout, kill_proc, [cfg, proc]) if timeout else None
         
     try:
         # start process
@@ -134,7 +134,7 @@ def execute_one(cfg, optpt, stdout, stderr):
         
         # start timer after starting process. That is important
         # otherwise a forked process gets the timer as well.
-        killer.start()
+        if killer: killer.start()
 
         start_time = time.time()
         elapsed = 0
@@ -156,7 +156,7 @@ def execute_one(cfg, optpt, stdout, stderr):
         kill_proc(cfg, proc)
         raise e
     finally:
-        killer.cancel()
+        if killer: killer.cancel()
 
     return retcode
 
@@ -238,9 +238,6 @@ def run(cfg, experiments, options):
             sys.exit(1)
 
     if not options.global_only:
-        # print initial info
-        info.print_exp_simple(1, total_runs, missing_runs)
-
         # execution loop
         for experiment in experiments:
             # One more run
@@ -250,16 +247,19 @@ def run(cfg, experiments, options):
             folder = core.get_folder(cfg, experiment)
 
             # show experiment info
-            info.show_info(cfg, experiment, 0, folder)
+            info.show_exp_info(cfg, experiment, folder,
+                               executed_runs+1, missing_runs,
+                               total_runs)
 
             # Execute the measurement
             exp_cpy = experiment.copy()
-            (executed, status, etime) = execute_isolated(cfg, exp_cpy,
-                                                 folder,
+            (executed, status, etime) = execute_isolated(cfg, 
+                                                         exp_cpy,
+                                                         folder,
                                                  options.show_output)
 
             if executed:
-                info.print_run(0, status, etime)
+                info.print_run(actual_runs, status, etime)
                 executed_runs += 1
             else:
                 print '<-> skipping'

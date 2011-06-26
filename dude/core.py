@@ -172,5 +172,10 @@ def check_cfg(cfg):
 
     assert hasattr(cfg, 'raw_output_dir')
 
+    if hasattr(cfg, 'runs'):
+        print "WARNING: runs is DEPRECATED. IGNORED" 
+
     # TODO remove
-    cfg.timeout = 100
+    if not hasattr(cfg, 'timeout'):
+        cfg.timeout = None
+
