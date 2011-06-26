@@ -78,6 +78,9 @@ group3 = optparse.OptionGroup(parser, 'sum specific options')
 group3.add_option('-b', '--backend', dest = 'backend', default = 'file',
                   help = 'backend to use for summary',
                   choices = summary_backends.backend_names())
+group3.add_option('--ignore-status', dest = 'ignore_status', 
+                  default = False, action = 'store_true',
+                  help = 'include failed experiments')
 
 group4 = optparse.OptionGroup(parser, 'list specific options')
 group4.add_option("-d", "--dict", action = "store_true",
@@ -149,6 +152,9 @@ def main(cargs):
      if hasattr(cfg, 'dude_version') and cfg.dude_version >= 3:
           dimensions.update(cfg)
 
+     experiments = core.get_experiments(cfg)
+     print experiments
+     # select only those that were successful?
      # TODO: the selection of experiments and how that interact with the commands should be redone.
      # the last parameter to filter_experiments include or exclude the not yet run experiments
 
@@ -163,7 +169,6 @@ def main(cargs):
      else:
           experiments = core.get_experiments(cfg)
 
-     print experiments
 
      cmd = cargs[0]
      if cmd == 'run':
@@ -179,7 +184,7 @@ def main(cargs):
                clean.clean_experiment(folder)
           execute.execute(cfg, optpt, 1, options.show_output, folder)
      elif cmd == 'sum':
-          summary.summarize(cfg, experiments, cargs[1:], options.backend)
+          summary.summarize(cfg, experiments, cargs[1:], options.backend, options.ignore_status)
      elif cmd == 'list':
           for experiment in experiments:
                if options.dict:

@@ -14,7 +14,8 @@ import summary_backends
 import summaries
 import utils
 
-def summarize_one(cfg, s, experiments, backend):
+def summarize_one(cfg, s, experiments, backend, 
+                  ignore_status = False):
     # group by X
     optspace = {}
     for k in s['groupby']: # select the right optspace
@@ -80,7 +81,9 @@ def summarize_one(cfg, s, experiments, backend):
                 outputFolder = core.get_folder(cfg, sample)
 
                 # check if test ok
-                if core.experiment_success(cfg, sample):
+                if core.experiment_success(cfg, sample) or\
+                        (ignore_status and\
+                             core.experiment_ran(cfg, sample)):
                     os.chdir(outputFolder)
                     outf = open(core.outputFile)
                     # call process
@@ -90,7 +93,8 @@ def summarize_one(cfg, s, experiments, backend):
         f.close()
         # next group
 
-def summarize(cfg, experiments, sel = [], backend = 'file'):
+def summarize(cfg, experiments, sel = [], backend = 'file', 
+              ignore_status = False):
     """  """
     # TODO check if exists
     if sel == []:
@@ -104,7 +108,8 @@ def summarize(cfg, experiments, sel = [], backend = 'file'):
         #if summary.has_key('preprocess'):
         #    preprocess_one(cfg, summary)
         if summary['name'] in sel:
-            summarize_one(cfg, summary, experiments, backend)
+            summarize_one(cfg, summary, experiments, backend, 
+                          ignore_status)
             sel.remove(summary['name'])
 
     for s in sel:
