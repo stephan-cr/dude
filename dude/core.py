@@ -2,7 +2,9 @@
 # Distributed under the MIT License
 # See accompanying file LICENSE
 
-"""Core functionality consists of generating points in the options space and generating names out of options.
+"""
+Core functionality consists of generating points in the options space
+and generating names out of options.
 """
 import os
 import utils
@@ -42,15 +44,17 @@ def get_raw_folder(cfg):
     utils.checkFolder(folder)
     return folder
 
-def get_name(prefix, optspace):
-    """Given a prefix, and an experiment (optspace), creates the a string to
-    identify the experiment."""
+def get_name(prefix, optpt):
+    """
+    Given a prefix and an optpt, creates the a string to identify the
+    experiment.
+    """
     s = prefix
-    l = optspace.keys()
+    l = optpt.keys()
     l.sort()
     for k in l:
         s += SEP + k
-        st=''.join(str(optspace[k]).split(' '))
+        st=''.join(str(optpt[k]).split(' '))
         s+=''.join(st.split('/'))
     return  s
 
@@ -164,7 +168,10 @@ def success_count(cfg, run_experiments):
     return c
 
 def check_cfg(cfg):
-    """ Verifies if loaded configuration file has fields necessary for this module."""
+    """
+    Verifies if loaded configuration file has fields necessary for
+    this module.
+    """
     assert hasattr(cfg, 'dude_version')
     assert getattr(cfg, 'dude_version') >= 3
 
