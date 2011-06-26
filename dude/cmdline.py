@@ -25,6 +25,7 @@ import execute
 import dimensions
 import filter as filt
 import clean
+import info
 
 desc = """Commands:
        clean\t delete experiments
