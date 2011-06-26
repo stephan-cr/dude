@@ -9,7 +9,7 @@ import utils
 import core
 import os
 
-HEAD = '_'*80
+HEAD = '~'*80
 HEAD2 = '~'*80
 LINE = '-'*80
 
@@ -41,34 +41,27 @@ class PBar:
         return "".join(out)
 
 
-def show_info(cfg, optspace = {}, folder = None):
-    if optspace == {}:
-        name = cfg.name if hasattr(cfg, 'name') else os.getcwd()
-        print HEAD2
-        print 'Experiment set:', name
-        print LINE
-        print 'Option space:'
-        for k in cfg.optspace.keys():
-            print '%20s' % (k), '=', cfg.optspace[k]
-        if len(cfg.constraints) == 0:
-            print 'Experiments: complete space'
-        else:
-            print 'Experiments: constrained space'
-        print "Timeout :", cfg.timeout
-        print LINE
-        print 'Summaries:'
-        for s in cfg.summaries:
-            print '\t', s['name']
-        if hasattr(cfg, 'filters'):
-            print 'Filters:'
-            for f in cfg.filters:
-                print '\t', f
-        else:
-            print 'Filters: None'
-        print HEAD2
-        print
+def show_info(cfg):
+    name = cfg.name if hasattr(cfg, 'name') else os.getcwd()
+    print HEAD2
+    print 'Experiment set:', name
+    print LINE
+    print 'Option space:'
+    for k in cfg.optspace.keys():
+        print '%20s' % (k), '=', cfg.optspace[k]
+    if len(cfg.constraints) == 0:
+        print 'Experiments: complete space'
     else:
-        assert False
+        print 'Experiments: constrained space'
+    print 'Summaries  :', [summ['name'] for summ in cfg.summaries]
+    if hasattr(cfg, 'filters'):
+        print 'Filters    :', [fil for fil in cfg.filters]
+    print "Timeout    :", cfg.timeout
+    print HEAD2
+    print
+    print
+    print
+
 
 def show_exp_info(cfg, experiment, folder, 
                   executed_runs, missing_runs, total_runs):
@@ -85,9 +78,8 @@ def show_exp_info(cfg, experiment, folder,
     print LINE
 
 def print_run(actual_runs, status, experiment_elapsed_time):
-    pass
-# print LINE
-    # print 'Status: %d'    % status
+    print LINE
+    print 'Status   : %d'    % status
     # print 'Time  : %.4fs' % experiment_elapsed_time
 
 def print_exp(actual_runs, executed_runs, missing_runs, total_runs,
@@ -101,8 +93,8 @@ def print_exp(actual_runs, executed_runs, missing_runs, total_runs,
 
     # strings
     s  = "Completed: %.1f%%" % (percent_exec)
-    s += "\tElapsed  : %s" % utils.sec2string(total_time)
-    s += "\tRemaining: %s (estimated)" % utils.sec2string(remaining_time)
+    #s += "\tElapsed  : %s" % utils.sec2string(total_time)
+    s += "\nRemaining: %s (estimated)" % utils.sec2string(remaining_time)
     print s
 
 def print_exp_simple(actual_runs, total_runs, missing_runs):

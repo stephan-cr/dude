@@ -198,8 +198,6 @@ def execute_isolated(cfg, optpt, folder, show_output = False):
         f.write(str(status))
         f.close()
 
-        print "status = ", status
-
         # call prepare experiment
         if hasattr(cfg, 'finish_exp'):
             cfg.finish_exp(optpt, status)
