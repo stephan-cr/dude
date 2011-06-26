@@ -14,29 +14,7 @@ import summary_backends
 import summaries
 import utils
 
-def preprocess_one(cfg, s):
-    """ """
-    assert False and "Not implemented"
-
-    # get experiments
-    experiments = core.get_experiments(cfg)
-    wd = os.getcwd()
-    for experiment in experiments:
-        for run in range(1, cfg.runs+1):
-            if experiment_success(cfg, experiment, run):
-                folder = core.get_folder(cfg, experiment, run)
-                os.chdir(folder)
-                fout = open(outputFile)
-                fout.readline() #remove first line
-                s['preprocess'](fout)
-                fout.close()
-                os.chdir(wd)
-
-def summarize_one(cfg, s, filtered_experiments, backend):
-    experiments = []
-    for run, experiment in filtered_experiments:
-        experiments.append(experiment)
-
+def summarize_one(cfg, s, experiments, backend):
     # group by X
     optspace = {}
     for k in s['groupby']: # select the right optspace
@@ -97,23 +75,22 @@ def summarize_one(cfg, s, filtered_experiments, backend):
 
         for (point, samples) in space:
             for sample in samples:
-                for run in range(1, cfg.runs+1):
-                    if not (run, sample) in filtered_experiments:
-                        continue
-                    outputFolder = core.get_folder(cfg, sample, run)
+                if sample not in experiments:
+                    continue
+                outputFolder = core.get_folder(cfg, sample)
 
-                    # check if test ok
-                    if core.experiment_success(cfg, sample, run):
-                        os.chdir(outputFolder)
-                        outf = open(core.outputFile)
-                        # call process
-                        s['process'](point, outf, f, wd + '/' + cfg.sum_output_dir)
-                        outf.close()
-                        os.chdir(wd)
+                # check if test ok
+                if core.experiment_success(cfg, sample):
+                    os.chdir(outputFolder)
+                    outf = open(core.outputFile)
+                    # call process
+                    s['process'](point, outf, f, wd + '/' + cfg.sum_output_dir)
+                    outf.close()
+                    os.chdir(wd)
         f.close()
         # next group
 
-def summarize(cfg, filtered_experiments, sel = [], backend = 'file'):
+def summarize(cfg, experiments, sel = [], backend = 'file'):
     """  """
     # TODO check if exists
     if sel == []:
@@ -127,7 +104,7 @@ def summarize(cfg, filtered_experiments, sel = [], backend = 'file'):
         #if summary.has_key('preprocess'):
         #    preprocess_one(cfg, summary)
         if summary['name'] in sel:
-            summarize_one(cfg, summary, filtered_experiments, backend)
+            summarize_one(cfg, summary, experiments, backend)
             sel.remove(summary['name'])
 
     for s in sel:

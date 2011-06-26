@@ -1,11 +1,16 @@
-# Copyright (c) 2010 Diogo Becker
+# Copyright (c) 2010, 2011 Diogo Becker
 # Distributed under the MIT License
 # See accompanying file LICENSE
 
-"""!!"""
+"""
+Dude output for experiments
+"""
 import utils
 import core
 import os
+
+HEAD = '~'*80
+LINE = '-'*80
 
 class PBar:
     """
@@ -35,30 +40,25 @@ class PBar:
         return "".join(out)
 
 
-def show_info(cfg, optspace = {}, run = 0, folder = None):
+def show_info(cfg, optspace = {}, folder = None):
     if optspace == {}:
         name = cfg.name if hasattr(cfg, 'name') else os.getcwd()
-        print '----------------------------------'
+        print HEAD
         print 'Experiment', name
-        print '----------------------------------'
+        print LINE
         print 'Options :'
         for k in cfg.optspace.keys():
             print '%8s' % (k), '=', cfg.optspace[k]
-        print 'Runs    :', str(cfg.runs)
         if len(cfg.constraints) == 0:
             print 'Samples : complete space'
         else:
             print 'Samples : constrained space'
         print "Timeout :", cfg.timeout
-        #print "Version :", cfg.dude_version
-        #else:
-        #    print 'Samples :', str(self.samples)
-        #    print 'Program :', str(self.progBaseName)
-        print '----------------------------------'
+        print LINE
         print 'Summaries:'
         for s in cfg.summaries:
             print '\t', s['name']
-        print '----------------------------------'
+        print LINE
         if hasattr(cfg, 'filters'):
             print 'Filters:'
             for f in cfg.filters:
@@ -72,7 +72,7 @@ def show_info(cfg, optspace = {}, run = 0, folder = None):
         for k in optspace.keys():
             print '%8s' % (k), '=', optspace[k]
         if folder == None:
-            folder = core.get_folder(cfg, optspace, run)
+            folder = core.get_folder(cfg, optspace)
         print '%8s' %('CWD'), '=', folder
         if hasattr(cfg, 'get_cmd'):
             print '%8s' %('CMD'), '=', cfg.get_cmd(optspace)

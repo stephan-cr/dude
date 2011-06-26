@@ -25,6 +25,7 @@ import execute
 import dimensions
 import filter as filt
 import clean
+import info
 
 desc = """Commands:
        clean\t delete experiments
@@ -160,7 +161,9 @@ def main(cargs):
      elif options.filter_inline:
           experiments = filt.filter_inline(cfg, options.filter_inline, options.invert, False)
      else:
-          experiments = core.get_run_experiments(cfg)
+          experiments = core.get_experiments(cfg)
+
+     print experiments
 
      cmd = cargs[0]
      if cmd == 'run':
@@ -178,11 +181,11 @@ def main(cargs):
      elif cmd == 'sum':
           summary.summarize(cfg, experiments, cargs[1:], options.backend)
      elif cmd == 'list':
-          for run, experiment in experiments:
+          for experiment in experiments:
                if options.dict:
-                    print "run:",run, "experiment:", experiment
+                    print "experiment:", experiment
                else:
-                    print core.get_folder(cfg, experiment, run)
+                    print core.get_folder(cfg, experiment)
      elif cmd == 'failed':
           failed = core.get_failed(cfg, False)
           for ffile in failed:

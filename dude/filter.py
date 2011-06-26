@@ -13,27 +13,27 @@ def filter_one(cfg, experiments, filter, invert, only_ran):
     """ """
     wd = os.getcwd()
     filtered_experiments = []
-    for (run, experiment) in experiments:
-        if only_ran and core.experiment_ran(cfg, experiment, run):
-            folder = core.get_folder(cfg, experiment, run)
+    for experiment in experiments:
+        if only_ran and core.experiment_ran(cfg, experiment):
+            folder = core.get_folder(cfg, experiment)
             os.chdir(folder)
             outf = open(core.outputFile)
             outf.readline()
-            ret = filter(experiment, run, outf)
+            ret = filter(experiment, outf)
             if not invert and ret:
-                filtered_experiments.append( (run, experiment) )
+                filtered_experiments.append( experiment )
             if invert and not ret:
-                filtered_experiments.append( (run, experiment) )
+                filtered_experiments.append( experiment )
             outf.close()
             os.chdir(wd)
         elif not only_ran:
-            folder = core.get_folder(cfg, experiment, run)
+            folder = core.get_folder(cfg, experiment)
             os.chdir(folder)
-            ret = filter(experiment, run, None)
+            ret = filter(experiment, None)
             if not invert and ret:
-                filtered_experiments.append( (run, experiment) )
+                filtered_experiments.append( experiment )
             if invert and not ret:
-                filtered_experiments.append( (run, experiment) )
+                filtered_experiments.append( experiment )
             os.chdir(wd)
     return filtered_experiments
 
@@ -41,27 +41,20 @@ def filter_one(cfg, experiments, filter, invert, only_ran):
 def filter_experiments(cfg, filters, invert, only_ran=True):
     """ """
     experiments = core.get_experiments(cfg)
-    filtered_experiments = []
-    for run in range(1, cfg.runs+1):
-        for experiment in experiments:
-            filtered_experiments.append( (run, experiment) )
+    filtered_experiments = experiments
 
     for f in filters:
         filtered_experiments  = filter_one(cfg, filtered_experiments, f, invert, only_ran)
     return filtered_experiments
 
 
-def generic_filter(experiment, run, outf, filters):
+def generic_filter(experiment, outf, filters):
     for key, value in filters:
         assert type(key) == str
         assert type(value) == list
 
-        if key == 'run':
-            if not run in value:
-                return False
-        else:
-            if not utils.parse_value(experiment[key]) in value:
-                return False
+        if not utils.parse_value(experiment[key]) in value:
+            return False
     return True
 
 
@@ -86,7 +79,7 @@ def filter_inline(cfg, filters, invert, only_ran=True):
             if v not in cfg.optspace[key]:
                 cfg.optspace[key].append(v)
 
-    return filter_experiments(cfg, [(lambda a,b,c: generic_filter(a,b,c,flts))], invert, only_ran)
+    return filter_experiments(cfg, [(lambda a, b: generic_filter(a,b,flts))], invert, only_ran)
 
 
 

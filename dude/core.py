@@ -28,15 +28,6 @@ def get_experiments(cfg):
             exps = exps_tmp
     return exps
 
-def get_run_experiments(cfg):
-    experiments = get_experiments(cfg)
-    run_experiments = []
-    runs = cfg.runs if hasattr(cfg, 'runs') else 1
-    for run in range(1, runs+1):
-        for experiment in experiments:
-            run_experiments.append( (run, experiment) )
-    return run_experiments
-
 def get_raw_folder(cfg):
     """Gets the raw folder of the experiments. Create it if necessary"""
     # get raw output folder
@@ -58,14 +49,9 @@ def get_name(prefix, optpt):
         s+=''.join(st.split('/'))
     return  s
 
-def get_folder(cfg, experiment, run):
+def get_folder(cfg, experiment):
     """Returns the experiment folder. Creates it if necessary."""
-    assert run > 0
-
     folder = get_raw_folder(cfg)
-
-    # add run subfolder
-    folder = folder + '/run' + str(run)
     utils.checkFolder(folder)
 
     # add experiment subfolder
@@ -85,9 +71,9 @@ def read_status_file(folder):
     return val
 
 
-def experiment_success(cfg, experiment, run):
+def experiment_success(cfg, experiment):
     """Checks if experiment ran correctly"""
-    outputFolder = get_folder(cfg, experiment, run)
+    outputFolder = get_folder(cfg, experiment)
     oFile   = outputFolder + '/' + outputFile
     sFile   = outputFolder + '/' + statusFile
 
@@ -107,9 +93,9 @@ def experiment_success(cfg, experiment, run):
     return True
 
 
-def experiment_ran(cfg, experiment, run):
+def experiment_ran(cfg, experiment):
     """Checks if experiment ran"""
-    outputFolder = get_folder(cfg, experiment, run)
+    outputFolder = get_folder(cfg, experiment)
     oFile   = outputFolder + '/' + outputFile
     sFile   = outputFolder + '/' + statusFile
 
@@ -122,34 +108,32 @@ def experiment_ran(cfg, experiment, run):
 def get_failed(cfg, missing = False):
     """Get the list of output files of executions that failed """
     failed = []
-    runs = os.listdir(get_raw_folder(cfg))
     experiments = get_experiments(cfg)
-    for run in runs:
-        for exp in experiments:
-            outputFolder = get_folder(cfg, exp, run.split('run')[1])
-            oFile   = outputFolder + '/' + outputFile
-            sFile   = outputFolder + '/' + statusFile
+    for exp in experiments:
+        outputFolder = get_folder(cfg, exp)
+        oFile   = outputFolder + '/' + outputFile
+        sFile   = outputFolder + '/' + statusFile
 
-            if not os.path.exists(sFile):
-                if missing:
-                    failed.append(exp)
-                    continue
-                else:
-                    # not run
-                    continue
+        if not os.path.exists(sFile):
+            if missing:
+                failed.append(exp)
+                continue
+            else:
+                # not run
+                continue
 
-            f = open(sFile, 'r')
-            try:
-                val = int(f.readline())
-            except ValueError: # there's no number to read
-                return False
-            finally:
-                f.close()
-            if val != 0:
-                if not missing:
-                    failed.append(oFile)
-                else:
-                    failed.append(exp)
+        f = open(sFile, 'r')
+        try:
+            val = int(f.readline())
+        except ValueError: # there's no number to read
+            return False
+        finally:
+            f.close()
+        if val != 0:
+            if not missing:
+                failed.append(oFile)
+            else:
+                failed.append(exp)
     return failed
 
 # def success_count(cfg, experiments):
@@ -160,10 +144,10 @@ def get_failed(cfg, missing = False):
 #                 c += 1
 #     return c
 
-def success_count(cfg, run_experiments):
+def success_count(cfg, experiments):
     c = 0
-    for run,e in run_experiments:
-        if experiment_success(cfg, e, run):
+    for experiment in experiments:
+        if experiment_success(cfg, experiment):
             c += 1
     return c
 
@@ -189,5 +173,4 @@ def check_cfg(cfg):
     assert hasattr(cfg, 'raw_output_dir')
 
     # TODO remove
-    cfg.runs = 1
     cfg.timeout = 100

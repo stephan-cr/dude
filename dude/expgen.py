@@ -14,11 +14,10 @@ def __create_folder(folder):
 
 dfile = """
 #    -*- mode: python -*-
-dude_version = 2
+dude_version = 3
 
 name    = "${expname}"
 timeout = 100
-runs    = 1
 
 prog = "echo"
 

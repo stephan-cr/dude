@@ -160,28 +160,18 @@ def execute_one(cfg, optpt, stdout, stderr):
 
     return retcode
 
-def execute_isolated(cfg, optpt, run, show_output = False, folder = None):
+def execute_isolated(cfg, optpt, folder, show_output = False):
     """Executes one experiment in a separate folder"""
     start = tc()
 
     e_start = e_end = 0
-
-    # get dir name and create if necessary
-    if folder == None:
-        folder = core.get_folder(cfg, optpt, run)
-
-    if run == 1:
-        # show experiment info
-        info.show_info(cfg, optpt, run, folder)
-
+    
     # skip successful runs
     if core.exist_status_file(folder):
         val = core.read_status_file(folder)
         if val == 0:
             # it ran successfully, don't repeat exp
-            print '<-> skipping ' + str(run)
-            print "Run", run, "skipped"
-            return (False, 0)
+            return (False, val, 0)
 
     # change working directory
     wd = os.getcwd()
@@ -192,12 +182,12 @@ def execute_isolated(cfg, optpt, run, show_output = False, folder = None):
         cfg.prepare_exp(optpt)
 
     e_start = tc()
+    status = -1
     try:
         fout = open(core.outputFile, 'w')
-        s = -1
-        s = execute_one(cfg, optpt, fout, fout)
+        status = execute_one(cfg, optpt, fout, fout)
     
-        if s != 0:
+        if status != 0:
             print 'command returned error value: %d' % s
 
     finally:
@@ -205,14 +195,14 @@ def execute_isolated(cfg, optpt, run, show_output = False, folder = None):
         if fout: fout.close()
 
         f = open(core.statusFile,'w')
-        f.write(str(s))
+        f.write(str(status))
         f.close()
 
-        print "status .. ", s
+        print "status = ", status
 
         # call prepare experiment
         if hasattr(cfg, 'finish_exp'):
-            cfg.finish_exp(optpt, s)
+            cfg.finish_exp(optpt, status)
 
         # go back to working dir
         os.chdir(wd)
@@ -220,21 +210,13 @@ def execute_isolated(cfg, optpt, run, show_output = False, folder = None):
     # return the time used
     end = tc()
 
-    info.print_run(run, s, (e_end - e_start))
-    return (True, (end-start))
-
-def execute(cfg, optpt, run, show_output, folder = None):
-    try:
-        return execute_isolated(cfg, optpt, run, show_output, folder)
-    except KeyboardInterrupt, e:
-        print e
-        return (False, 0)
+    return (True, status, (end-start))
 
 def run(cfg, experiments, options):
-    """Generate the experiment space and calls execute() for each experiment"""
-    # check configuration and folders
-    #self.checkRequirements()
-    #self.checkFolders()
+    """
+    Generate the experiment space and calls execute() for each
+    experiment.
+    """
 
     # print information
     info.show_info(cfg)
@@ -260,17 +242,28 @@ def run(cfg, experiments, options):
         info.print_exp_simple(1, total_runs, missing_runs)
 
         # execution loop
-        for i in range(0, len(experiments)):
-            run,experiment = experiments[i]
+        for experiment in experiments:
             # One more run
             actual_runs += 1
+
+            # get dir name and create if necessary
+            folder = core.get_folder(cfg, experiment)
+
+            # show experiment info
+            info.show_info(cfg, experiment, 0, folder)
+
             # Execute the measurement
             exp_cpy = experiment.copy()
-            (executed, etime) = execute(cfg, exp_cpy, run, options.show_output)
+            (executed, status, etime) = execute_isolated(cfg, exp_cpy,
+                                                 folder,
+                                                 options.show_output)
 
             if executed:
+                info.print_run(0, status, etime)
                 executed_runs += 1
-
+            else:
+                print '<-> skipping'
+            
             # Add elapsed time to mean object
             elapsed_time.add(etime)
                 
@@ -278,7 +271,9 @@ def run(cfg, experiments, options):
             t_actual = tc()
 
             # Print some time information
-            info.print_exp(actual_runs, executed_runs, missing_runs, total_runs, t_actual - t_start, elapsed_time)
+            info.print_exp(actual_runs, executed_runs, 
+                           missing_runs, total_runs, 
+                           t_actual - t_start, elapsed_time)
     # end not global_only
 
     if hasattr(cfg, 'finish_global') and not options.skip_global:
@@ -289,7 +284,6 @@ def run(cfg, experiments, options):
             sys.exit(1)
 
 def check_cfg(cfg):
-    assert hasattr(cfg, 'runs')
     assert hasattr(cfg, 'options')
     assert type(cfg.options) == dict
     # assert hasattr(cfg, 'constraints') optional
