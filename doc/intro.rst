@@ -17,7 +17,7 @@ A set of experiments is described by an option space, *optspace* for short, and 
 
 
 Each dimension of the optspace has a domain: ``[1024,2048]``, ``[10, 50, 100]``, ``["high.dat", "low.dat"]``, etc.
-An optpt in this space (i.e., an experiment) is for example::
+An optpt in this space is for example::
 
   some_optpt = {
     'buffer_size' : 1024,
@@ -35,7 +35,7 @@ For example, our program is ``echo`` and simply print on the screen the buffer s
     def cmdl_exp(optpt):
     	return "echo buffer_size=%d" % optpt['buffer_size']
 
-When Dude is invoked, it generates all optpts of an optspace by calculating its cartesian product. 
+When Dude is invoked, it generates all optpts of an optspace by calculating its cartesian product.
 It then creates for each experiment a folder, and spawns the command line inside this folder.
 A minimal Dudefile follows::
 
@@ -52,64 +52,80 @@ A minimal Dudefile follows::
       (optpt['buffer_size'], optpt['timeout'])
 
 
+.. hint:: Dude allows the user to define :ref:`constraints` to limit the optpts to a subset of the optspace.
+
 Calling the Dude
 ----------------
 
-To start executing experiments, Dude has to be called from the command line in any folder where a Dudefile exists with a ``run`` argument:
+Dude is a command line tool which accepts several commands to start, stop, delete, filter, and aggregate experiments.
+It is usually started in a folder where there is Dudefile, for example, try ``examples/echo``.
+The command ``info`` shows an overview of the Dudefile in the current folder:
+
+.. code-block:: console
+
+   examples/echo$ ls
+   Dudefile
+   examples/echo$ dude info
+   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   Experiment set: examples/echo
+   --------------------------------------------------------------------------------
+   Option space:
+   	        buffer_size = [1024, 2048, 4096]
+          	    timeout = [10, 50, 100]
+   Experiments: complete space
+   Summaries  : ['default']
+   Timeout    : None
+   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+
+
+
+The typical workflow of a user consists however of four steps, two of them performed by Dude:
+
+1. Creation of a Dudefile;
+2. Execution experiments upon invocation of ``dude run``; 
+3. Aggregation of results upon invocation of ``dude sum``;
+4. And, use of resulting aggregations for further plotting and analysis.
+
+
+Execution
+^^^^^^^^^
+
+To start executing experiments, Dude is invoked from the command linewith a ``run`` argument in any folder where a Dudefile exists:
 
 .. code-block:: console
 
   examples/echo$ dude run 
 
-The experiments are started sequentially in different folders.
-When first started, Dude creates a ``raw`` subfolder and for each experiment a subfolder in it, for example ``raw/exp__buffer_size1024__timeout50``.
-Therefore, the experiments can write in the their root folders without conflicting with each other.
-The subfolders where experiments are executed are called *expfolders*.
-Once an experiment is finished, either correctly or by crashing, its results generated on the stardard output and its return value are stored in the files ``dude.output`` and ``dude.status`` respectively, both placed in the experiment's expfolder.
+  ...
 
 
+Dude executes the experiments in time and space isolation. 
+Experiments are started sequentially by Dude, hence, avoiding contention on resources such as network adaptors, CPUs, etc.
+Additionally, an experiment can write and read from its working directory without interfering or being interfered by other experiments.
+When first started, Dude creates a ``raw`` subfolder and for each experiment a subfolder in ``raw``, for example ``raw/exp__buffer_size1024__timeout50``.
+The latters are called *expfolders*.
+The working directory of the experiments are always their expfolders.
 
-.. To check which experiments failed one can use following program.
+Once an experiment is finished, either correctly or by crashing, its results on the stardard output and its return value are stored in the files ``dude.output`` and ``dude.status`` respectively, both placed in the experiment's expfolder.
+For checking which experiments failed, one can simply type:
 
+.. code-block:: console
 
-
-
-..   examples/updown$ cat muddi.cfg 
-..   upload   = [('sedell08', ['muddi.cfg'], '/tmp')]
-..   cmds     = [('sedell08', 'mv /tmp/muddi.cfg /tmp/muddi2.cfg && echo "#some comment" >> /tmp/muddi2.cfg')]
-..   download = [('sedell08', ['/tmp/muddi2.cfg'], '.')]
-..   logdir   = None
-
-..   examples/updown$ muddi -f muddi.cfg upload
-..   # muddi: ('timeout = 300 seconds',)
-..   # muddi: (['scp', 'muddi.cfg', 'sedell08:/tmp'], 'STARTED')
-..   # muddi: ('first phase =', [0], ' | second phase =', [])
-
-..   examples/updown$ muddi -f muddi.cfg execute
-..   # muddi: ('timeout = 300 seconds',)
-..   # muddi: (['ssh', 'sedell08', 'mv /tmp/muddi.cfg /tmp/muddi2.cfg && echo "#some comment" >> /tmp/muddi2.cfg'], 'STARTED')
-..   # muddi: ('first phase =', [0], ' | second phase =', [])
-
-..   examples/updown$ muddi -f muddi.cfg download
-..   # muddi: ('timeout = 300 seconds',)
-..   # muddi: (['scp', 'sedell08:/tmp/muddi2.cfg', '.'], 'STARTED')
-..   # muddi: ('first phase =', [0], ' | second phase =', [])
-
-..   examples/updown$ cat muddi2.cfg 
-..   upload   = [('sedell08', ['muddi.cfg'], '/tmp')]
-..   cmds     = [('sedell08', 'mv /tmp/muddi2.cfg && echo "#some comment" >> /tmp/muddi2.cfg')]
-..   download = [('sedell08', ['/tmp/muddi2.cfg'], '.')]
-..   logdir   = None
-..   #some comment
+  examples/echo$ dude failed
+  raw/exp__buffer_size1024__timeout100/dude.output
 
 
-.. The folder structure of Dude ...
+In this example, the experiment with optpt ``{ 'buffer_size' : 1024, 'timeout' : 100 }`` returned with a value different than 0 (it failed).
+When invoking ``dude run`` again, only failed (or not yet run) experiments are executed.
+Dude provides several other commands to manage expfolders (see TBD).
 
 Summaries
----------
+^^^^^^^^^
 
-Dude can collect, filter, aggregate any information from the experiments.
-For that the user simply invokes Dude as follows:
+Dude can collect, filter, aggregate any information from experiments.
+For that the user invokes
 
 .. code-block:: console
 
@@ -117,7 +133,7 @@ For that the user simply invokes Dude as follows:
 
 
 By default, Dude simply concatenates the output to the stdout of every experiment into the file ``output/default``.
-After calling ``dude run``, the user can access this file with any program to further process or plot this data, for example:
+After calling ``dude sum``, the user can access the resuling aggregation file with any program to further process, analyze or plot it, for example:
  
 .. code-block:: console
 
@@ -134,10 +150,12 @@ After calling ``dude run``, the user can access this file with any program to fu
   4096 100 buffer_size=4096 timeout=100
 
 
-Other ``summary`` objects can be added directly to the Dudefile::
+Dude provides several *summary* objects which can be added directly to the Dudefile as follows::
       
       import dude.summaries
       summaries = [ dude.summaries.LineSelect('stdout') ]  
+
+Additionally, the user can extend any of the summaries and add it to the ``summaries`` variable in the Dudefile.
 
 
 From optpts to configuration files
@@ -165,6 +183,6 @@ Here is an example::
     return "cat config.txt"
 
 
-Because Dude runs the experiments in separate expfolders, ``prepare_exp'' do not overwrite the configuration files of other experiments even if they are named in the same way for all experiments.
+Because Dude runs the experiments in separate expfolders, ``prepare_exp`` do not overwrite the configuration files of other experiments even if they are named in the same way for all experiments.
 
 
