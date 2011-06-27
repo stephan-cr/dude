@@ -166,12 +166,12 @@ def main(cargs):
           execute.run(cfg, experiments, options)
      elif cmd == 'run-once':
           assert len(experiments) == 1
-          optpt =  experiments[0][1]
+          optpt =  experiments[0]
           folder = "once"
           utils.checkFolder(folder) # create if necessary
           if options.force:
                clean.clean_experiment(folder)
-          execute.execute(cfg, optpt, 1, options.show_output, folder)
+          execute.execute_isolated(cfg, optpt, folder, options.show_output)
      elif cmd == 'sum':
           summary.summarize(cfg, experiments, cargs[1:], 
                             options.backend, options.ignore_status)

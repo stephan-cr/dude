@@ -188,7 +188,7 @@ def execute_isolated(cfg, optpt, folder, show_output = False):
         status = execute_one(cfg, optpt, fout, fout)
     
         if status != 0:
-            print 'command returned error value: %d' % s
+            print 'command returned error value: %d' % status
 
     finally:
         e_end = tc()
