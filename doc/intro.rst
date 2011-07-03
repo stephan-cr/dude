@@ -16,20 +16,20 @@ A set of experiments is described by an option space, *optspace* for short, and 
   }
 
 
-Each dimension of the optspace has a domain: ``[1024,2048]``, ``[10, 50, 100]``, ``["high.dat", "low.dat"]``, etc.
+Each dimension of the optspace has a domain: ``[1024, 2048]``, ``[10, 50, 100]``, ``["high.dat", "low.dat"]``, etc.
 An optpt in this space is for example::
 
   some_optpt = {
     'buffer_size' : 1024,
     'timeout'     : 50
-  }  
+  }
 
 
 From optpts to command lines
 ----------------------------
 
 The most basic usage of Dude is the creation of command lines based on optpts.
-For that, the user provides in the Dudefile a simple method called ``cmdl_exp`` which transforms an optpt into a string. 
+For that, the user provides in the Dudefile a simple method called ``cmdl_exp`` which transforms an optpt into a string.
 For example, our program is ``echo`` and simply print on the screen the buffer size::
 
     def cmdl_exp(optpt):
@@ -84,7 +84,7 @@ The command ``info`` shows an overview of the Dudefile in the current folder:
 The typical workflow of a user consists however of four steps, two of them performed by Dude:
 
 1. Creation of a Dudefile;
-2. Execution experiments upon invocation of ``dude run``; 
+2. Execution experiments upon invocation of ``dude run``;
 3. Aggregation of results upon invocation of ``dude sum``;
 4. And, use of resulting aggregations for further plotting and analysis.
 
@@ -92,23 +92,23 @@ The typical workflow of a user consists however of four steps, two of them perfo
 Execution
 ^^^^^^^^^
 
-To start executing experiments, Dude is invoked from the command linewith a ``run`` argument in any folder where a Dudefile exists:
+To start executing experiments, Dude is invoked from the command line with a ``run`` argument in any folder where a Dudefile exists:
 
 .. code-block:: console
 
-  examples/echo$ dude run 
+  examples/echo$ dude run
 
   ...
 
 
-Dude executes the experiments in time and space isolation. 
-Experiments are started sequentially by Dude, hence, avoiding contention on resources such as network adaptors, CPUs, etc.
+Dude executes the experiments in time and space isolation.
+Experiments are started sequentially by Dude, hence, avoiding contention on resources such as network adapters, CPUs, etc.
 Additionally, an experiment can write and read from its working directory without interfering or being interfered by other experiments.
 When first started, Dude creates a ``raw`` subfolder and for each experiment a subfolder in ``raw``, for example ``raw/exp__buffer_size1024__timeout50``.
-The latters are called *expfolders*.
+The latter are called *expfolders*.
 The working directory of the experiments are always their expfolders.
 
-Once an experiment is finished, either correctly or by crashing, its results on the stardard output and its return value are stored in the files ``dude.output`` and ``dude.status`` respectively, both placed in the experiment's expfolder.
+Once an experiment is finished, either correctly or by crashing, its results on the standard output and its return value are stored in the files ``dude.output`` and ``dude.status`` respectively, both placed in the experiment's expfolder.
 For checking which experiments failed, one can simply type:
 
 .. code-block:: console
@@ -133,11 +133,11 @@ For that the user invokes
 
 
 By default, Dude simply concatenates the output to the stdout of every experiment into the file ``output/default``.
-After calling ``dude sum``, the user can access the resuling aggregation file with any program to further process, analyze or plot it, for example:
- 
+After calling ``dude sum``, the user can access the resulting aggregation file with any program to further process, analyze or plot it, for example:
+
 .. code-block:: console
 
-  examples/echo$ cat output/default 
+  examples/echo$ cat output/default
 
   1024 10 buffer_size=1024 timeout=10
   1024 50 buffer_size=1024 timeout=50
@@ -151,9 +151,9 @@ After calling ``dude sum``, the user can access the resuling aggregation file wi
 
 
 Dude provides several *summary* objects which can be added directly to the Dudefile as follows::
-      
+
       import dude.summaries
-      summaries = [ dude.summaries.LineSelect('stdout') ]  
+      summaries = [ dude.summaries.LineSelect('stdout') ]
 
 Additionally, the user can extend any of the summaries and add it to the ``summaries`` variable in the Dudefile.
 
@@ -184,5 +184,3 @@ Here is an example::
 
 
 Because Dude runs the experiments in separate expfolders, ``prepare_exp`` do not overwrite the configuration files of other experiments even if they are named in the same way for all experiments.
-
-
