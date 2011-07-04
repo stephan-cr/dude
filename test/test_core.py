@@ -11,12 +11,6 @@ class CoreTestCase(unittest.TestCase):
         cfg = CFGMock()
         self.assertEquals(len(dude.core.get_experiments(cfg)), 4)
 
-    def test_get_run_experiments(self):
-        cfg = CFGMock()
-        self.assertEquals(len(dude.core.get_run_experiments(cfg)), 4)
-        cfg.runs = 2
-        self.assertEquals(len(dude.core.get_run_experiments(cfg)), 8)
-
     def test_get_name(self):
         cfg = CFGMock()
         exp = {'a' : 1}
