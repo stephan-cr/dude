@@ -26,6 +26,10 @@ def get_experiments(cfg):
                 if c(exp):
                     exps_tmp.append(exp)
             exps = exps_tmp
+
+    if hasattr(cfg, 'optpt_cmp'):
+        exps.sort(cmp=cfg.optpt_cmp)
+
     return exps
 
 def get_raw_folder(cfg):

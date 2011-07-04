@@ -6,10 +6,22 @@ class CFGMock:
     constraints = [lambda x: True]
     optspace = {'a' : [1, 2], 'b' : [2, 3]}
 
+class CFGMockOptptCmp(CFGMock):
+    def optpt_cmp(self, optpt1, optpt2):
+        return cmp(optpt1, optpt2)
+
 class CoreTestCase(unittest.TestCase):
     def test_get_experiments(self):
         cfg = CFGMock()
         self.assertEquals(len(dude.core.get_experiments(cfg)), 4)
+
+    def test_get_experiments_with_optpt_cmp(self):
+        cfg = CFGMockOptptCmp()
+        exps1 = dude.core.get_experiments(cfg)
+        cfg.optpt_cmp = lambda optpt1, optpt2: cmp(optpt2, optpt1)
+        exps2 = dude.core.get_experiments(cfg)
+        exps2.reverse()
+        self.assertEquals(exps1, exps2)
 
     def test_get_name(self):
         cfg = CFGMock()
