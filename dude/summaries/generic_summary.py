@@ -121,10 +121,10 @@ class FilesLineSelect:
         return s
 
 
-    def summarize(self, fd, folder = '.'):
+    def summarize(self, fd, optpt = None, folder = '.'):
         wd = os.getcwd()
         os.chdir(folder)
-        self.proc({}, None, fd, None)
+        self.proc(optpt, None, fd, None)
         os.chdir(wd)
 
 
