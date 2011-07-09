@@ -5,6 +5,7 @@
 """Manages the execution of experiments"""
 
 import core
+import traceback
 import fcntl
 import info
 import os
@@ -79,7 +80,7 @@ class ForkProcess:
         if (npid, status) == (0,0):
             return False
         else:
-            print status, npid, self.pid
+            # print status, npid, self.pid
             self.status = status
             return True
 
@@ -91,19 +92,20 @@ class ForkProcess:
             assert False 
 
     def __child(self):
-        # def bahm():
-        #     print "bahm bahm baaahm"
-        #     sys.exit(1)
-        # signal.signal(signal.SIGINT, lambda num, frame: bahm())
         sys.stdout = self.stdout
         sys.stderr = self.stderr
     
         print "dude: child start"
         try:
             ret = self.func(self.optpt)
+            print "dude: child exit"
         except KeyboardInterrupt, e:
             sys.exit(-1)
         except Exception, e:
+            print "Exception in fork_cmd:"
+            print '#'*60
+            traceback.print_exc(file=sys.stdout)
+            print '#'*60
             sys.exit(1)
         if ret == None:
             ret = 0
@@ -184,11 +186,14 @@ def execute_isolated(cfg, optpt, folder, show_output = False):
     e_start = tc()
     status = -1
     try:
-        fout = open(core.outputFile, 'w')
+        if show_output:
+            fout = utils.Tee(core.outputFile, 'w')
+        else:
+            fout = open(core.outputFile, 'w')
+
         status = execute_one(cfg, optpt, fout, fout)
-    
         if status != 0:
-            print 'command returned error value: %d' % s
+            print 'command returned error value: %d' % status
 
     finally:
         e_end = tc()
@@ -254,7 +259,7 @@ def run(cfg, experiments, options):
             (executed, status, etime) = execute_isolated(cfg, 
                                                          exp_cpy,
                                                          folder,
-                                                 options.show_output)
+                                                         options.show_output)
 
             if executed:
                 info.print_run(actual_runs, status, etime)

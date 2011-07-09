@@ -57,6 +57,9 @@ parser.add_option("-a", "--args",
                   dest = "margs", metavar = "ARGS",
                   help = "arguments to Dudefile separated by semicolons"
                   "\ne.g. -a \"option1=value;option2=[value3,value4]\"")
+parser.add_option("-o", default = False,
+                  dest = "show_output", action = "store_true",
+                  help = "show experiment's output")
 
 group2 = optparse.OptionGroup(parser, 'run specific options')
 group2.add_option("--force", action = "store_true",
@@ -140,10 +143,6 @@ def main(cargs):
 
      if hasattr(cfg, 'dude_version') and cfg.dude_version >= 3:
           dimensions.update(cfg)
-
-     # show_output is always true, but it has no effect 
-     # TODO: remove this option completely
-     options.show_output = True
      
      experiments = []
      if options.filter != None:
