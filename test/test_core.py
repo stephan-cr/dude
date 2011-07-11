@@ -1,6 +1,7 @@
 import unittest
 
 import dude.core
+import dude.defaults
 
 class CFGMock:
     constraints = [lambda x: True]
@@ -9,6 +10,9 @@ class CFGMock:
 class CFGMockOptptCmp(CFGMock):
     def optpt_cmp(self, optpt1, optpt2):
         return cmp(optpt1, optpt2)
+
+class CFGMockOrderDim(CFGMock):
+    pass
 
 class CoreTestCase(unittest.TestCase):
     def test_get_experiments(self):
@@ -22,6 +26,14 @@ class CoreTestCase(unittest.TestCase):
         exps2 = dude.core.get_experiments(cfg)
         exps2.reverse()
         self.assertEquals(exps1, exps2)
+
+    def test_get_experiments_with_order_dim(self):
+        cfg = CFGMockOrderDim()
+        cfg.optpt_cmp = dude.defaults.order_dim(['b', 'a'])
+        exps1 = dude.core.get_experiments(cfg)
+        cfg.optpt_cmp = dude.defaults.order_dim(['a'])
+        exps2 = dude.core.get_experiments(cfg)
+        self.assertNotEquals(exps1, exps2)
 
     def test_get_name(self):
         cfg = CFGMock()
