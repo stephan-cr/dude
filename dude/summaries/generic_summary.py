@@ -43,7 +43,7 @@ class LineSelect:
             }
         if self.header == None:
             s['header'] = lambda h: ""
-        elif self.header.__class__ == "".__class__:
+        elif type(self.header) == str:
             s['header'] = lambda h: h + self.header
         else:
             s['header'] = self.header
@@ -79,10 +79,10 @@ class FilesLineSelect:
         for k in keys:
             s += optpt[k] + ' '
 
-        if self.files.__class__ == "".__class__:
+        if type(self.files) == str:
             files = glob.glob(self.files)
         else:
-            assert self.files.__class__ == [].__class__
+            assert type(self.files) == list
 
         if not self.quiet:
             print "FilesLineSelect using files ", files
@@ -110,7 +110,7 @@ class FilesLineSelect:
             }
         if self.header == None:
             s['header'] = lambda h: ""
-        elif self.header.__class__ == "".__class__:
+        elif type(self.header) == str:
             if self.fname_header == None:
                 s['header'] = lambda h: h  + ' file ' + self.header
             else:
@@ -204,10 +204,10 @@ class FilesMultiLineSelect:
             s += optpt[k] + ' '
 
 
-        if self.files.__class__ == "".__class__:
+        if type(self.files) == str:
             files = glob.glob(self.files)
         else:
-            assert self.files.__class__ == [].__class__
+            assert type(self.files) == list
 
         print "FilesMultiLineSelect using files ", files
         for fn in files:
