@@ -30,7 +30,7 @@ class MetaData:
         cPickle.dump(self, meta_file, 2)
         os.fsync(meta_file)
         meta_file.close()
-        os.rename(raw_folder + '/meta.tmp', 
+        os.rename(raw_folder + '/meta.tmp',
                   raw_folder + '/' + META_FILE)
 
     def __str__(self):
@@ -164,6 +164,6 @@ def check_cfg(cfg):
 
     assert hasattr(cfg, 'optspace')
     assert type(cfg.optspace) == dict
-    
+
     assert hasattr(cfg, 'raw_output_dir')
 

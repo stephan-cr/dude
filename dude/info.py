@@ -63,12 +63,12 @@ def show_info(cfg):
     print
 
 
-def show_exp_info(cfg, experiment, folder, 
+def show_exp_info(cfg, experiment, folder,
                   executed_runs, missing_runs, total_runs):
     print HEAD
     print 'Experiment: %d of %d (total: %d)'  % (executed_runs,
                                                  missing_runs,
-                                                 total_runs)  
+                                                 total_runs)
     print 'Folder :', folder
     print 'Options:'
     for k in experiment.keys():
@@ -112,7 +112,7 @@ def print_elapsed(timeout, elapsed, last_elapsed = None):
     p = elapsed * 1000 / timeout * 100
     p /= 1000
 
-    if (p > 100) or (p < 0): 
+    if (p > 100) or (p < 0):
         b.fill(100)
         print b, "\ttime out!!                  "
     else:

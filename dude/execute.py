@@ -28,14 +28,14 @@ class SpawnProcess:
         self.optpt  = optpt
         self.stdout = stdout
         self.stderr = stderr
-        
+
     def kill(self):
         self.proc.kill()
         self.status = self.proc.wait()
         self.proc = None
-        
+
     def poll(self):
-        if self.status: 
+        if self.status:
             return True
 
         assert self.proc != None
@@ -61,7 +61,7 @@ class ForkProcess:
         self.optpt  = optpt
         self.stdout = stdout
         self.stderr = stderr
-        
+
     def kill(self):
         assert self.pid != os.getpid()
 
@@ -89,12 +89,12 @@ class ForkProcess:
         if self.pid == 0:
             self.__child()
             # should exit in __execute_child
-            assert False 
+            assert False
 
     def __child(self):
         sys.stdout = self.stdout
         sys.stderr = self.stderr
-    
+
         print "dude: child start"
         try:
             ret = self.func(self.optpt)
@@ -129,11 +129,11 @@ def execute_one(cfg, optpt, stdout, stderr):
         proc = ForkProcess(cfg.fork_exp, optpt, stdout, stderr)
 
     killer = Timer(timeout, kill_proc, [cfg, proc]) if timeout else None
-        
+
     try:
         # start process
         proc.start()
-        
+
         # start timer after starting process. That is important
         # otherwise a forked process gets the timer as well.
         if killer: killer.start()
@@ -141,7 +141,7 @@ def execute_one(cfg, optpt, stdout, stderr):
         start_time = time.time()
         elapsed = 0
         while True:
-    
+
             if proc.poll():
                 retcode = proc.status
                 info.print_elapsed(timeout, elapsed)
@@ -167,7 +167,7 @@ def execute_isolated(cfg, optpt, folder, show_output = False):
     start = tc()
 
     e_start = e_end = 0
-    
+
     # skip successful runs
     if core.exist_status_file(folder):
         val = core.read_status_file(folder)
@@ -256,7 +256,7 @@ def run(cfg, experiments, options):
 
             # Execute the measurement
             exp_cpy = experiment.copy()
-            (executed, status, etime) = execute_isolated(cfg, 
+            (executed, status, etime) = execute_isolated(cfg,
                                                          exp_cpy,
                                                          folder,
                                                          options.show_output)
@@ -266,16 +266,16 @@ def run(cfg, experiments, options):
                 executed_runs += 1
             else:
                 print '<-> skipping'
-            
+
             # Add elapsed time to mean object
             elapsed_time.add(etime)
-                
+
             # Calculate the total time
             t_actual = tc()
 
             # Print some time information
-            info.print_exp(actual_runs, executed_runs, 
-                           missing_runs, total_runs, 
+            info.print_exp(actual_runs, executed_runs,
+                           missing_runs, total_runs,
                            t_actual - t_start, elapsed_time)
     # end not global_only
 

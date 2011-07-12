@@ -3,7 +3,7 @@
     ~~~~
 
     experimentation framework.
-    
+
     :copyright: Copyright 2010-2011 Diogo Becker.
     :license: MIT, see LICENSE for details.
 """

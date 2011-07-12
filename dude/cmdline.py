@@ -76,7 +76,7 @@ group3 = optparse.OptionGroup(parser, 'sum specific options')
 group3.add_option('-b', '--backend', dest = 'backend', default = 'file',
                   help = 'backend to use for summary',
                   choices = summary_backends.backend_names())
-group3.add_option('--ignore-status', dest = 'ignore_status', 
+group3.add_option('--ignore-status', dest = 'ignore_status',
                   default = False, action = 'store_true',
                   help = 'include failed experiments')
 
@@ -143,21 +143,21 @@ def main(cargs):
 
      if hasattr(cfg, 'dude_version') and cfg.dude_version >= 3:
           dimensions.update(cfg)
-     
+
      experiments = []
      if options.filter != None:
           filters = []
           for f in options.filter.split(','):
                filters.append(cfg.filters[f])
-          experiments = filt.filter_experiments(cfg, filters, 
+          experiments = filt.filter_experiments(cfg, filters,
                                                 options.invert, True)
      elif options.filter_inline:
-          experiments = filt.filter_inline(cfg, 
+          experiments = filt.filter_inline(cfg,
                                            options.filter_inline,
                                            options.invert, False)
      else:
           experiments = core.get_experiments(cfg)
-     
+
      cmd = cargs[0]
      if cmd == 'run':
           if options.force:
@@ -172,7 +172,7 @@ def main(cargs):
                clean.clean_experiment(folder)
           execute.execute_isolated(cfg, optpt, folder, options.show_output)
      elif cmd == 'sum':
-          summary.summarize(cfg, experiments, cargs[1:], 
+          summary.summarize(cfg, experiments, cargs[1:],
                             options.backend, options.ignore_status)
      elif cmd == 'list':
           for experiment in experiments:
