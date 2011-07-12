@@ -6,7 +6,6 @@
 
 import core
 import traceback
-import fcntl
 import info
 import os
 import signal

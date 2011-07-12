@@ -8,14 +8,14 @@ cmdline
 
 Command line interface.
 """
-from dude import __version__
+
+from . import __version__
 
 import os
 import sys
 import optparse
 import imp
 import utils
-import summaries
 import summary_backends
 import summary
 import args

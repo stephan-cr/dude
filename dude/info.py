@@ -6,7 +6,6 @@
 Dude output for experiments
 """
 import utils
-import core
 import os
 
 HEAD = '~'*80
