@@ -12,36 +12,38 @@ def __create_folder(folder):
 
 
 
-dfile = """
-#    -*- mode: python -*-
+dfile = """\
+# -*- mode: python -*-
+
 dude_version = 3
+from dude.defaults import *
 
 name    = "${expname}"
-timeout = 100
 
-prog = "echo"
-
-options = {
+optspace = {
   'param1' : [1,2,3]
 }
 
-raw_output_dir = "raw"
+prog = "echo"
+
 def prepare_global():
     pass
+
 def prepare_exp(optpt):
     pass
-def get_cmd(optpt):
-    return prog + " bla: " + str(optpt['param1'])
-def finish_exp(optpt):
-    pass
 
-sum_output_dir = "output"
+def cmdl_exp(optpt):
+    return prog + " bla: " + str(optpt['param1'])
+
+def finish_exp(optpt, status):
+    pass
 
 import dude.summaries
 sum = dude.summaries.LineSelect (
 	name   = 'example_summary',
         regex  = '.*',
-        split  = (lambda l: l.split(':')[1])
+        split  = (lambda l: l.split(':')[1]),
+        header = "result"
 	)
 
 summaries = [sum]
