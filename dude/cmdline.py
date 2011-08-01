@@ -28,16 +28,17 @@ import clean
 import info
 
 desc = """Commands:
-       clean\t delete experiments
-       failed\t list all failed experiments
-       info\t show experiment description info
-       list\t list directories of executed experiments
-       missing\t list all missing experiments
-       run\t run all experiments
-       sum\t summarize results using given summaries
+       clean\t\t delete experiments
+       create <FOLDER>\t create FOLDER and a Dudefile in it
+       failed\t\t list all failed experiments
+       info\t\t show experiment description info
+       list\t\t list directories of executed experiments
+       missing\t\t list all missing experiments
+       run\t\t run all missing experiments
+       sum [<NAME>]\t summarize results (NAME optional)
 """
 
-parser = optparse.OptionParser(usage="%prog [options] command",
+parser = optparse.OptionParser(usage="%prog [OPTIONS] <COMMAND> <ARGS>",
                                version="%prog " + __version__,
                                description = desc,
                                formatter = utils.IndentedHelpFormatterWithNL())
