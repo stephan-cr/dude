@@ -63,8 +63,19 @@ class Sqlite3SumBackend:
         else:
             cols = header
 
-        self.__cursor.execute('create table %s (%s);' % \
-                              (self.__name.split('/')[-1], ', '.join(cols)))
+        table_name = self.__name.split('/')[-1]
+
+        # check if table already exists
+        # SQLite FAQ: http://www.sqlite.org/faq.html#q7
+        self.__cursor.execute('''
+select count(name) from sqlite_master where type=\'table\' and name=?;''',
+                              (table_name,))
+
+        if self.__cursor.fetchone()[0] > 0:
+            self.__cursor.execute('delete from %s;' % table_name)
+        else:
+            self.__cursor.execute('create table %s (%s);' % \
+                                      (table_name, ', '.join(cols)))
 
     def write(self, string):
         '''

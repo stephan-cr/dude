@@ -1,21 +1,21 @@
-"""
-    cmdline
-    ~~~~~~~
-
-    Command line interface.
-
-    :copyright: Copyright (c) 2011 Diogo Becker
-    :license: MIT, see LICENSE for details.
+# Copyright (c) 2011 Diogo Becker
+# Distributed under the MIT License
+# See accompanying file LICENSE
 
 """
-from dude import __version__
+cmdline
+~~~~~~~
+
+Command line interface.
+"""
+
+from . import __version__
 
 import os
 import sys
 import optparse
 import imp
 import utils
-import summaries
 import summary_backends
 import summary
 import args
@@ -28,16 +28,17 @@ import clean
 import info
 
 desc = """Commands:
-       clean\t delete experiments
-       failed\t list all failed experiments
-       info\t show experiment description info
-       list\t list directories of executed experiments
-       missing\t list all missing experiments
-       run\t run all experiments
-       sum\t summarize results using given summaries
+       clean\t\t delete experiments
+       create <FOLDER>\t create FOLDER and a Dudefile in it
+       failed\t\t list all failed experiments
+       info\t\t show experiment description info
+       list\t\t list directories of executed experiments
+       missing\t\t list all missing experiments
+       run\t\t run all missing experiments
+       sum [<NAME>]\t summarize results (NAME optional)
 """
 
-parser = optparse.OptionParser(usage="%prog [options] command",
+parser = optparse.OptionParser(usage="%prog [OPTIONS] <COMMAND> <ARGS>",
                                version="%prog " + __version__,
                                description = desc,
                                formatter = utils.IndentedHelpFormatterWithNL())
@@ -57,13 +58,11 @@ parser.add_option("-a", "--args",
                   dest = "margs", metavar = "ARGS",
                   help = "arguments to Dudefile separated by semicolons"
                   "\ne.g. -a \"option1=value;option2=[value3,value4]\"")
-parser.add_option("--dry", default = False,
-                  dest = "dry", action = "store_true",
-                  help = "dry run (sets global dry variable to True)")
+parser.add_option("-o", default = False,
+                  dest = "show_output", action = "store_true",
+                  help = "show experiment's output")
+
 group2 = optparse.OptionGroup(parser, 'run specific options')
-group2.add_option("-n","--no-output", action = "store_false",
-                  dest = "show_output", default = True,
-                  help = "omit the output of experiment")
 group2.add_option("--force", action = "store_true",
                   dest = "force", default = False,
                   help = "force execution")
@@ -78,6 +77,9 @@ group3 = optparse.OptionGroup(parser, 'sum specific options')
 group3.add_option('-b', '--backend', dest = 'backend', default = 'file',
                   help = 'backend to use for summary',
                   choices = summary_backends.backend_names())
+group3.add_option('--ignore-status', dest = 'ignore_status',
+                  default = False, action = 'store_true',
+                  help = 'include failed experiments')
 
 group4 = optparse.OptionGroup(parser, 'list specific options')
 group4.add_option("-d", "--dict", action = "store_true",
@@ -134,58 +136,51 @@ def main(cargs):
      # check if cfg can be used for summaries
      summary.check_cfg(cfg)
 
-     # set dry run variable
-     if options.dry:
-          cfgdry = True
-     else:
-          cfgdry = False
-
      # parse arguments to module
      if options.margs:
           margs = args.parse(options.margs)
-          print "arguments to Dudefile:", margs
+          print "Passing arguments:", margs
           args.set_args(cfg, margs)
 
      if hasattr(cfg, 'dude_version') and cfg.dude_version >= 3:
           dimensions.update(cfg)
-
-     # TODO: the selection of experiments and how that interact with the commands should be redone.
-     # the last parameter to filter_experiments include or exclude the not yet run experiments
 
      experiments = []
      if options.filter != None:
           filters = []
           for f in options.filter.split(','):
                filters.append(cfg.filters[f])
-          experiments = filt.filter_experiments(cfg, filters, options.invert, True)
+          experiments = filt.filter_experiments(cfg, filters,
+                                                options.invert, True)
      elif options.filter_inline:
-          experiments = filt.filter_inline(cfg, options.filter_inline, options.invert, False)
+          experiments = filt.filter_inline(cfg,
+                                           options.filter_inline,
+                                           options.invert, False)
      else:
-          experiments = core.get_run_experiments(cfg)
+          experiments = core.get_experiments(cfg)
 
      cmd = cargs[0]
      if cmd == 'run':
-          execute.init()
           if options.force:
                clean.clean_experiments(cfg, experiments)
           execute.run(cfg, experiments, options)
      elif cmd == 'run-once':
           assert len(experiments) == 1
-          optpt =  experiments[0][1]
-          execute.init()
+          optpt =  experiments[0]
           folder = "once"
           utils.checkFolder(folder) # create if necessary
           if options.force:
                clean.clean_experiment(folder)
-          execute.execute(cfg, optpt, 1, options.show_output, folder)
+          execute.execute_isolated(cfg, optpt, folder, options.show_output)
      elif cmd == 'sum':
-          summary.summarize(cfg, experiments, cargs[1:], options.backend)
+          summary.summarize(cfg, experiments, cargs[1:],
+                            options.backend, options.ignore_status)
      elif cmd == 'list':
-          for run, experiment in experiments:
+          for experiment in experiments:
                if options.dict:
-                    print "run:",run, "experiment:", experiment
+                    print "experiment:", experiment
                else:
-                    print core.get_folder(cfg, experiment, run)
+                    print core.get_folder(cfg, experiment)
      elif cmd == 'failed':
           failed = core.get_failed(cfg, False)
           for ffile in failed:
@@ -194,15 +189,15 @@ def main(cargs):
           failed = core.get_failed(cfg, True)
           for exp in failed:
                print exp
-     elif cmd == 'force-fail':
-          print "ERROR: Command not implemented!"
-          sys.exit(1)
      elif cmd == 'clean':
-          # TODO if no filter applied, ask if that's really what the user wants.
+          # TODO if no filter applied, ask if that's really what the
+          # user wants.
           r = 'y'
-          if options.filter == None and options.filter_inline == None:
+          if options.filter == None and\
+                   options.filter_inline == None:
                print "sure to wanna delete everything? [y/N]"
-               r = utils.getch() #raw_input("Skip, quit, or continue? [s/q/c]")
+               r = utils.getch() #raw_input("Skip, quit, or continue?
+                                 #[s/q/c]")
 
           if r == 'y':
                clean.clean_experiments(cfg, experiments)

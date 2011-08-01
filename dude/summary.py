@@ -1,43 +1,26 @@
-# Copyright (c) 2010 Diogo Becker
+# Copyright (c) 2010, 2011 Diogo Becker
 # Distributed under the MIT License
 # See accompanying file LICENSE
 
-""" """
+"""
+Methods to collect results from experiments (in expfolders),
+processing them, and writting the summaries out.
+"""
 
 import os
 
 import core
 import summary_backends
+import summaries
 import utils
 
-def preprocess_one(cfg, s):
-    """ """
-    assert False and "Not implemented"
-
-    # get experiments
-    experiments = core.get_experiments(cfg)
-    wd = os.getcwd()
-    for experiment in experiments:
-        for run in range(1, cfg.runs+1):
-            if experiment_success(cfg, experiment, run):
-                folder = core.get_folder(cfg, experiment, run)
-                os.chdir(folder)
-                fout = open(outputFile)
-                fout.readline() #remove first line
-                s['preprocess'](fout)
-                fout.close()
-                os.chdir(wd)
-
-def summarize_one(cfg, s, filtered_experiments, backend):
-    experiments = []
-    for run, experiment in filtered_experiments:
-        experiments.append(experiment)
-
+def summarize_one(cfg, s, experiments, backend,
+                  ignore_status = False):
     # group by X
-    options = {}
-    for k in s['groupby']: # select the right options
-        options[k] = cfg.options[k]
-    groups = utils.groupBy(experiments, options)
+    optspace = {}
+    for k in s['groupby']: # select the right optspace
+        optspace[k] = cfg.optspace[k]
+    groups = utils.groupBy(experiments, optspace)
 
     # create summary output directory if necessary
     utils.checkFolder(cfg.sum_output_dir)
@@ -51,12 +34,12 @@ def summarize_one(cfg, s, filtered_experiments, backend):
     # for each group, call process of s
     for (group, elements) in groups:
         print "Group: ", group, " entries:", len(elements)
-        options = {}
+        optspace = {}
         for i in s['dimensions']:
-            options[i] = cfg.options[i]
+            optspace[i] = cfg.optspace[i]
 
         # get experiments that match ?????
-        space = utils.groupBy(elements, options)
+        space = utils.groupBy(elements, optspace)
 
         oFile = cfg.sum_output_dir + '/' + core.get_name(s['name'], group)
 
@@ -65,7 +48,7 @@ def summarize_one(cfg, s, filtered_experiments, backend):
         cols = s['dimensions'] + other_cols
         cols_sz = []
         for dimension in s['dimensions']:
-            lengths = map(lambda x: len(str(x)), options[dimension])
+            lengths = map(lambda x: len(str(x)), optspace[dimension])
             lengths.append(len(dimension))
             cols_sz.append(max(lengths))
         cols_sz += map(len, other_cols)
@@ -93,23 +76,25 @@ def summarize_one(cfg, s, filtered_experiments, backend):
 
         for (point, samples) in space:
             for sample in samples:
-                for run in range(1, cfg.runs+1):
-                    if not (run, sample) in filtered_experiments:
-                        continue
-                    outputFolder = core.get_folder(cfg, sample, run)
+                if sample not in experiments:
+                    continue
+                outputFolder = core.get_folder(cfg, sample)
 
-                    # check if test ok
-                    if core.experiment_success(cfg, sample, run):
-                        os.chdir(outputFolder)
-                        outf = open(core.outputFile)
-                        # call process
-                        s['process'](point, outf, f, wd + '/' + cfg.sum_output_dir)
-                        outf.close()
-                        os.chdir(wd)
+                # check if test ok
+                if core.experiment_success(cfg, sample) or\
+                        (ignore_status and\
+                             core.experiment_ran(cfg, sample)):
+                    os.chdir(outputFolder)
+                    outf = open(core.outputFile)
+                    # call process
+                    s['process'](point, outf, f, wd + '/' + cfg.sum_output_dir)
+                    outf.close()
+                    os.chdir(wd)
         f.close()
         # next group
 
-def summarize(cfg, filtered_experiments, sel = [], backend = 'file'):
+def summarize(cfg, experiments, sel = [], backend = 'file',
+              ignore_status = False):
     """  """
     # TODO check if exists
     if sel == []:
@@ -123,16 +108,25 @@ def summarize(cfg, filtered_experiments, sel = [], backend = 'file'):
         #if summary.has_key('preprocess'):
         #    preprocess_one(cfg, summary)
         if summary['name'] in sel:
-            summarize_one(cfg, summary, filtered_experiments, backend)
+            summarize_one(cfg, summary, experiments, backend,
+                          ignore_status)
             sel.remove(summary['name'])
 
     for s in sel:
         print s, "not valid"
 
 def check_cfg(cfg):
+    assert hasattr(cfg, 'dude_version')
+    assert getattr(cfg, 'dude_version') >= 3
+
+    assert hasattr(cfg, 'optspace')
     assert hasattr(cfg, 'sum_output_dir')
-    assert hasattr(cfg, 'summaries')
-    assert type(cfg.summaries) == list
+
+    if not hasattr(cfg, 'summaries'):
+        cfg.summaries = [summaries.LineSelect('default')]
+    else:
+        assert type(cfg.summaries) == list
+
     summ = []
     for s in cfg.summaries:
         if type(s) == dict:

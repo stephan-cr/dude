@@ -1,21 +1,39 @@
 import unittest
 
 import dude.core
+import dude.defaults
 
 class CFGMock:
     constraints = [lambda x: True]
-    options = {'a' : [1, 2], 'b' : [2, 3]}
+    optspace = {'a' : [1, 2], 'b' : [2, 3]}
+
+class CFGMockOptptCmp(CFGMock):
+    def optpt_cmp(self, optpt1, optpt2):
+        return cmp(optpt1, optpt2)
+
+class CFGMockOrderDim(CFGMock):
+    pass
 
 class CoreTestCase(unittest.TestCase):
     def test_get_experiments(self):
         cfg = CFGMock()
         self.assertEquals(len(dude.core.get_experiments(cfg)), 4)
 
-    def test_get_run_experiments(self):
-        cfg = CFGMock()
-        self.assertEquals(len(dude.core.get_run_experiments(cfg)), 4)
-        cfg.runs = 2
-        self.assertEquals(len(dude.core.get_run_experiments(cfg)), 8)
+    def test_get_experiments_with_optpt_cmp(self):
+        cfg = CFGMockOptptCmp()
+        exps1 = dude.core.get_experiments(cfg)
+        cfg.optpt_cmp = lambda optpt1, optpt2: cmp(optpt2, optpt1)
+        exps2 = dude.core.get_experiments(cfg)
+        exps2.reverse()
+        self.assertEquals(exps1, exps2)
+
+    def test_get_experiments_with_order_dim(self):
+        cfg = CFGMockOrderDim()
+        cfg.optpt_cmp = dude.defaults.order_dim(['b', 'a'])
+        exps1 = dude.core.get_experiments(cfg)
+        cfg.optpt_cmp = dude.defaults.order_dim(['a'])
+        exps2 = dude.core.get_experiments(cfg)
+        self.assertNotEquals(exps1, exps2)
 
     def test_get_name(self):
         cfg = CFGMock()
@@ -28,7 +46,6 @@ class CoreTestCase(unittest.TestCase):
 
     def test_check_cfg(self):
         cfg = CFGMock()
-        cfg.name = 'Foo'
         cfg.raw_output_dir = 'raw'
-        cfg.dude_version = 2
+        cfg.dude_version = 3
         dude.core.check_cfg(cfg)

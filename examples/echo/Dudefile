@@ -1,0 +1,12 @@
+#    -*- mode: python -*-
+from dude.defaults import *
+dude_version = 3
+
+optspace = {
+    'buffer_size' : [1024, 2048, 4096],
+    'timeout'     : [10, 50, 100]
+    }
+
+def cmdl_exp(optpt):
+    return "echo buffer_size=%d timeout=%d" %\
+        (optpt['buffer_size'], optpt['timeout'])
