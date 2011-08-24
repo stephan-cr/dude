@@ -80,7 +80,7 @@ class ForkProcess:
             return False
         else:
             # print status, npid, self.pid
-            self.status = status
+            self.status = os.WEXITSTATUS(status)
             return True
 
     def start(self):
@@ -91,24 +91,27 @@ class ForkProcess:
             assert False
 
     def __child(self):
+        so, se = sys.stdout, sys.stderr
         sys.stdout = self.stdout
         sys.stderr = self.stderr
 
         print "dude: child start"
         try:
             ret = self.func(self.optpt)
-            print "dude: child exit"
+            print "dude: child exit", ret
         except KeyboardInterrupt, e:
-            sys.exit(-1)
+            os._exit(1)
         except Exception, e:
             print "Exception in fork_cmd:"
             print '#'*60
             traceback.print_exc(file=sys.stdout)
             print '#'*60
-            sys.exit(1)
+            os._exit(2)
+        finally:
+            sys.stdout, sys.stderr = so, se
         if ret == None:
             ret = 0
-        sys.exit(ret)
+        os._exit(ret)
 
 def kill_proc(cfg, proc):
     """Stops the experiment and asks if it should stop the complete set of experiments or not"""
