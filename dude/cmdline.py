@@ -91,118 +91,118 @@ parser.add_option_group(group3)
 parser.add_option_group(group4)
 
 def main(cargs):
-     # parse command line
-     (options, cargs) = parser.parse_args(cargs)
+    # parse command line
+    (options, cargs) = parser.parse_args(cargs)
 
-     # check if a command has been given
-     if cargs == []:
-          parser.print_help()
-          sys.exit()
+    # check if a command has been given
+    if cargs == []:
+        parser.print_help()
+        sys.exit()
 
      # create requires no Dudefile, so we deal with it right here
-     if cargs[0] == "create":
-          expgen.create(cargs[1])
-          sys.exit(0)
+    if cargs[0] == "create":
+        expgen.create(cargs[1])
+        sys.exit(0)
 
-     # all other commands require a Dudefile, so we first load it (in "cfg")
-     cfg = None
+    # all other commands require a Dudefile, so we first load it (in "cfg")
+    cfg = None
 
-     # use a given dudefile in options
-     if options.expfile != None:
-          try:
-               cfg = imp.load_source('', options.expfile)
-          except IOError:
-               print >> sys.stderr, 'ERROR: Loading', options.expfile, 'failed'
-               parser.print_help()
-               sys.exit(1)
-     else: # try default file names
-          for f in ['desc.py', 'dudefile', 'Dudefile', 'dudefile.py']:
-               try:
-                    cfg = imp.load_source('', f)
-                    break
-               except IOError:
-                    pass
-          if cfg == None:
-               print >> sys.stderr, 'ERROR: no dudefile found'
-               parser.print_help()
-               sys.exit(1)
+    # use a given dudefile in options
+    if options.expfile != None:
+        try:
+            cfg = imp.load_source('', options.expfile)
+        except IOError:
+            print >> sys.stderr, 'ERROR: Loading', options.expfile, 'failed'
+            parser.print_help()
+            sys.exit(1)
+    else: # try default file names
+        for f in ['desc.py', 'dudefile', 'Dudefile', 'dudefile.py']:
+            try:
+                cfg = imp.load_source('', f)
+                break
+            except IOError:
+                pass
+        if cfg == None:
+            print >> sys.stderr, 'ERROR: no dudefile found'
+            parser.print_help()
+            sys.exit(1)
 
-     # add to actual folder as root in cfg
-     cfg.root = os.getcwd()
+    # add to actual folder as root in cfg
+    cfg.root = os.getcwd()
 
-     # check if cfg can be used for core functions
-     core.check_cfg(cfg)
+    # check if cfg can be used for core functions
+    core.check_cfg(cfg)
 
-     # check if cfg can be used for summaries
-     summary.check_cfg(cfg)
+    # check if cfg can be used for summaries
+    summary.check_cfg(cfg)
 
-     # parse arguments to module
-     if options.margs:
-          margs = args.parse(options.margs)
-          print "Passing arguments:", margs
-          args.set_args(cfg, margs)
+    # parse arguments to module
+    if options.margs:
+        margs = args.parse(options.margs)
+        print "Passing arguments:", margs
+        args.set_args(cfg, margs)
 
-     if hasattr(cfg, 'dude_version') and cfg.dude_version >= 3:
-          dimensions.update(cfg)
+    if hasattr(cfg, 'dude_version') and cfg.dude_version >= 3:
+        dimensions.update(cfg)
 
-     experiments = []
-     if options.filter != None:
-          filters = []
-          for f in options.filter.split(','):
-               filters.append(cfg.filters[f])
-          experiments = filt.filter_experiments(cfg, filters,
-                                                options.invert, True)
-     elif options.filter_inline:
-          experiments = filt.filter_inline(cfg,
-                                           options.filter_inline,
-                                           options.invert, False)
-     else:
-          experiments = core.get_experiments(cfg)
+    experiments = []
+    if options.filter != None:
+        filters = []
+        for f in options.filter.split(','):
+            filters.append(cfg.filters[f])
+        experiments = filt.filter_experiments(cfg, filters,
+                                              options.invert, True)
+    elif options.filter_inline:
+        experiments = filt.filter_inline(cfg,
+                                         options.filter_inline,
+                                         options.invert, False)
+    else:
+        experiments = core.get_experiments(cfg)
 
-     cmd = cargs[0]
-     if cmd == 'run':
-          if options.force:
-               clean.clean_experiments(cfg, experiments)
-          execute.run(cfg, experiments, options)
-     elif cmd == 'run-once':
-          assert len(experiments) == 1
-          optpt =  experiments[0]
-          folder = "once"
-          utils.checkFolder(folder) # create if necessary
-          if options.force:
-               clean.clean_experiment(folder)
-          execute.execute_isolated(cfg, optpt, folder, options.show_output)
-     elif cmd == 'sum':
-          summary.summarize(cfg, experiments, cargs[1:],
-                            options.backend, options.ignore_status)
-     elif cmd == 'list':
-          for experiment in experiments:
-               if options.dict:
-                    print "experiment:", experiment
-               else:
-                    print core.get_folder(cfg, experiment)
-     elif cmd == 'failed':
-          failed = core.get_failed(cfg, False)
-          for ffile in failed:
-               print ffile
-     elif cmd == 'missing':
-          failed = core.get_failed(cfg, True)
-          for exp in failed:
-               print exp
-     elif cmd == 'clean':
-          # TODO if no filter applied, ask if that's really what the
-          # user wants.
-          r = 'y'
-          if options.filter == None and\
-                   options.filter_inline == None:
-               print "sure to wanna delete everything? [y/N]"
-               r = utils.getch() #raw_input("Skip, quit, or continue?
-                                 #[s/q/c]")
+    cmd = cargs[0]
+    if cmd == 'run':
+        if options.force:
+            clean.clean_experiments(cfg, experiments)
+        execute.run(cfg, experiments, options)
+    elif cmd == 'run-once':
+        assert len(experiments) == 1
+        optpt =  experiments[0]
+        folder = "once"
+        utils.checkFolder(folder) # create if necessary
+        if options.force:
+            clean.clean_experiment(folder)
+        execute.execute_isolated(cfg, optpt, folder, options.show_output)
+    elif cmd == 'sum':
+        summary.summarize(cfg, experiments, cargs[1:],
+                          options.backend, options.ignore_status)
+    elif cmd == 'list':
+        for experiment in experiments:
+            if options.dict:
+                print "experiment:", experiment
+            else:
+                print core.get_folder(cfg, experiment)
+    elif cmd == 'failed':
+        failed = core.get_failed(cfg, False)
+        for ffile in failed:
+            print ffile
+    elif cmd == 'missing':
+        failed = core.get_failed(cfg, True)
+        for exp in failed:
+            print exp
+    elif cmd == 'clean':
+        # TODO if no filter applied, ask if that's really what the
+        # user wants.
+        r = 'y'
+        if options.filter == None and \
+                options.filter_inline == None:
+            print "sure to wanna delete everything? [y/N]"
+            r = utils.getch() #raw_input("Skip, quit, or continue?
+                              #[s/q/c]")
 
-          if r == 'y':
-               clean.clean_experiments(cfg, experiments)
-     elif cmd == 'info':
-          info.show_info(cfg)
-     else:
-          print >> sys.stderr, "ERROR: wrong command. %s" % cargs[0]
-          parser.print_help()
+        if r == 'y':
+            clean.clean_experiments(cfg, experiments)
+    elif cmd == 'info':
+        info.show_info(cfg)
+    else:
+        print >> sys.stderr, "ERROR: wrong command. %s" % cargs[0]
+        parser.print_help()
