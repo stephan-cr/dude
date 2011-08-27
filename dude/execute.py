@@ -168,8 +168,6 @@ def execute_isolated(cfg, optpt, folder, show_output = False):
     """Executes one experiment in a separate folder"""
     start = tc()
 
-    e_start = e_end = 0
-
     # skip successful runs
     if core.exist_status_file(folder):
         val = core.read_status_file(folder)
@@ -185,7 +183,6 @@ def execute_isolated(cfg, optpt, folder, show_output = False):
     if hasattr(cfg, 'prepare_exp'):
         cfg.prepare_exp(optpt)
 
-    e_start = tc()
     status = -1
     try:
         if show_output:
@@ -198,7 +195,6 @@ def execute_isolated(cfg, optpt, folder, show_output = False):
             print 'command returned error value: %d' % status
 
     finally:
-        e_end = tc()
         if fout: fout.close()
 
         f = open(core.statusFile,'w')
