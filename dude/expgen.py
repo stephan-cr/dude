@@ -56,6 +56,11 @@ def __create_dfile(folder, expname):
     f.close()
 
 
-def create(expname):
-    __create_folder(expname)
-    __create_dfile(expname, expname)
+def create(expname=None):
+    foldername = expname
+    if expname is None or expname == '.':
+        expname = os.path.basename(os.getcwd())
+        foldername = '.'
+    else:
+        __create_folder(expname)
+    __create_dfile(foldername, expname)

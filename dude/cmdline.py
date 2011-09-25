@@ -101,7 +101,10 @@ def main(cargs):
 
      # create requires no Dudefile, so we deal with it right here
     if cargs[0] == "create":
-        expgen.create(cargs[1])
+        if len(cargs) < 2:
+            expgen.create()
+        else:
+            expgen.create(cargs[1])
         sys.exit(0)
 
     # all other commands require a Dudefile, so we first load it (in "cfg")
