@@ -64,8 +64,10 @@ class ForkProcess:
     def kill(self):
         assert self.pid != os.getpid()
 
-        os.kill(self.pid, signal.SIGINT)
-        (npid, status) = os.waitpid(self.pid, 0)
+        (npid, status) = os.waitpid(self.pid, os.WNOHANG)
+        if (npid, status) == (0,0):
+            os.kill(self.pid, signal.SIGINT)
+            (npid, status) = os.waitpid(self.pid, 0)
         self.pid = None
         # print "return code was : ", status
         self.status = status
@@ -95,12 +97,11 @@ class ForkProcess:
         sys.stdout = self.stdout
         sys.stderr = self.stderr
 
+        ret = 1
         print "dude: child start"
         try:
             ret = self.func(self.optpt)
             print "dude: child exit", ret
-        except KeyboardInterrupt, e:
-            os._exit(1)
         except Exception, e:
             print "Exception in fork_cmd:"
             print '#'*60
@@ -109,15 +110,17 @@ class ForkProcess:
             os._exit(2)
         finally:
             sys.stdout, sys.stderr = so, se
-        if ret == None:
-            ret = 0
-        os._exit(ret)
+            if ret == None:
+                ret = 0
+            os._exit(ret)
 
 def kill_proc(cfg, proc):
     """Stops the experiment and asks if it should stop the complete set of experiments or not"""
     proc.kill()
     if hasattr(cfg, 'on_kill'):
         cfg.on_kill(None)
+    # time.sleep(3)
+    os._exit(1)
 
 def execute_one(cfg, optpt, stdout, stderr):
     """Run experiment in a child process. Kill process on timeout or keyboard interruption."""
@@ -132,7 +135,13 @@ def execute_one(cfg, optpt, stdout, stderr):
 
     killer = Timer(timeout, kill_proc, [cfg, proc]) if timeout else None
 
+    # save old sigint handler
+    old_handler = signal.getsignal(signal.SIGINT)
+
     try:
+        # overwrite sigint handler
+        signal.signal(signal.SIGINT, lambda num, frame: kill_proc(cfg, proc))
+
         # start process
         proc.start()
 
@@ -154,13 +163,12 @@ def execute_one(cfg, optpt, stdout, stderr):
             elapsed = time.time() - start_time
             if elapsed >= 5 and elapsed < timeout:
                 info.print_elapsed(timeout, elapsed)
-
-    except KeyboardInterrupt, e:
-        print
-        kill_proc(cfg, proc)
-        raise e
     finally:
+        # restore sigint handleer
+        signal.signal(signal.SIGINT, old_handler)
+
         if killer: killer.cancel()
+        # print >>sys.stderr, "ciao", os.getpid()
 
     return retcode
 
