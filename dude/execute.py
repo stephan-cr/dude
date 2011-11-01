@@ -119,13 +119,14 @@ class ForkProcess:
                 ret = 0
             os._exit(ret)
 
-def kill_proc(cfg, proc):
+def kill_proc(cfg, proc, terminate):
     """Stops the experiment and asks if it should stop the complete set of experiments or not"""
     proc.kill()
     if hasattr(cfg, 'on_kill'):
         cfg.on_kill(None)
     # time.sleep(3)
-    os._exit(1)
+    if terminate:
+        os._exit(1)
 
 def execute_one(cfg, optpt, stdout, stderr):
     """Run experiment in a child process. Kill process on timeout or keyboard interruption."""
@@ -138,14 +139,14 @@ def execute_one(cfg, optpt, stdout, stderr):
         assert hasattr(cfg, 'fork_exp')
         proc = ForkProcess(cfg.fork_exp, optpt, stdout, stderr)
 
-    killer = Timer(timeout, kill_proc, [cfg, proc]) if timeout else None
+    killer = Timer(timeout, kill_proc, [cfg, proc, False]) if timeout else None
 
     # save old sigint handler
     old_handler = signal.getsignal(signal.SIGINT)
 
     try:
         # overwrite sigint handler
-        signal.signal(signal.SIGINT, lambda num, frame: kill_proc(cfg, proc))
+        signal.signal(signal.SIGINT, lambda num, frame: kill_proc(cfg, proc, True))
 
         # start process
         proc.start()
