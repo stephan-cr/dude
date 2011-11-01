@@ -19,7 +19,10 @@ tc = time.time
 
 
 class SpawnProcess:
-    """Run experiment in a subprocess"""
+    """Run experiment in a subprocess.  Because process runs with
+    shell True, we need to use process groups to terminate the
+    process.
+    """
     def __init__(self, func, optpt, stdout, stderr):
         self.proc   = None
         self.status = None
@@ -29,7 +32,7 @@ class SpawnProcess:
         self.stderr = stderr
 
     def kill(self):
-        self.proc.kill()
+        os.killpg(self.proc.pid, signal.SIGKILL)
         self.status = self.proc.wait()
         self.proc = None
 
@@ -49,7 +52,9 @@ class SpawnProcess:
         self.proc = subprocess.Popen(self.func(self.optpt),
                                      shell = True,
                                      stderr = self.stdout,
-                                     stdout = self.stderr)
+                                     stdout = self.stderr,
+                                     preexec_fn = os.setsid
+                                     )
 
 class ForkProcess:
     """Fork process and start a experiment."""
