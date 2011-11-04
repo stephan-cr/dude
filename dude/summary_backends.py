@@ -7,10 +7,11 @@ various summary backends
 '''
 
 import os
+import json
 import sqlite3
 
 class FileSumBackend:
-    def __init__(self, name):
+    def __init__(self, name, dimensions):
         self.__file = open(name, 'w')
 
     def write_header(self, header):
@@ -40,6 +41,36 @@ class FileSumBackend:
     def __del__(self):
         self.close()
 
+class JsonSumBackend:
+    def __init__(self, name, dimensions):
+        self.__name = name
+        self.__dimensions = dimensions
+        self.__jsonobj = {}
+
+    def write_header(self, header):
+        if type(header) == str:
+            self.__header = header.split()
+        elif type(header) == list:
+            self.__header = header
+
+    def write(self, string):
+        subdoc = self.__jsonobj
+        values = string.strip().split()
+
+        if len(values) != len(self.__header):
+            return
+
+        for i in range(len(self.__dimensions)):
+            subdoc = subdoc.setdefault(self.__header[i], {})
+            subdoc = subdoc.setdefault(values[i], {})
+            
+        for j in range(len(self.__header) - len(self.__dimensions)):
+            subdoc[self.__header[len(self.__dimensions) + j]] = values[len(self.__dimensions) + j]
+
+    def close(self):
+        with open(self.__name + '.json', 'w') as jsonfile:
+            json.dump(self.__jsonobj, jsonfile, indent=4)
+
 class Sqlite3SumBackend:
     '''
     sqlite3 database backend support
@@ -47,7 +78,7 @@ class Sqlite3SumBackend:
     behaves like a "file-like" object
     '''
 
-    def __init__(self, name):
+    def __init__(self, name, dimensions):
         self.__name = name
         self.__connection = sqlite3.connect(name + '.sqlite3')
         self.__cursor = self.__connection.cursor()
@@ -103,7 +134,7 @@ select count(name) from sqlite_master where type=\'table\' and name=?;''',
     def __del__(self):
         self.close()
 
-registry = { 'file' : FileSumBackend, 'sqlite3' : Sqlite3SumBackend }
+registry = { 'file' : FileSumBackend, 'json' : JsonSumBackend, 'sqlite3' : Sqlite3SumBackend }
 
 def backend_names():
     return registry.keys()

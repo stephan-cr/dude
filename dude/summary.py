@@ -73,7 +73,7 @@ def summarize_one(cfg, s, experiments, backend,
         print '-'*(sum(cols_sz)+len(cols_sz))
 
         # open file for group
-        f = summary_backends.backend_constructor(backend)(oFile)
+        f = summary_backends.backend_constructor(backend)(oFile, dimensions)
 
         # write header
         if is_new(s):
