@@ -3,3 +3,5 @@
 # See accompanying file LICENSE
 
 from generic_summary import *
+from base import *
+from json_summary import *

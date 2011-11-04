@@ -14,11 +14,24 @@ import summary_backends
 import summaries
 import utils
 
+def is_new(summary):
+    return isinstance(summary, summaries.SummaryBase)
+
 def summarize_one(cfg, s, experiments, backend,
                   ignore_status = False):
     # group by X
     optspace = {}
-    for k in s['groupby']: # select the right optspace
+
+    if is_new(s):
+        groupby    = s.groupby()
+        name       = s.name()
+        dimensions = cfg.optspace.keys()
+    else:
+        groupby    = s['groupby']
+        name       = s['name']
+        dimensions = s['dimensions']
+
+    for k in groupby: # select the right optspace
         optspace[k] = cfg.optspace[k]
     groups = utils.groupBy(experiments, optspace)
 
@@ -29,25 +42,26 @@ def summarize_one(cfg, s, experiments, backend,
     wd = os.getcwd()
 
     print
-    print "starting summary", s['name']
+    print "Summary:", name
 
     # for each group, call process of s
     for (group, elements) in groups:
         print "Group: ", group, " entries:", len(elements)
         optspace = {}
-        for i in s['dimensions']:
+
+        for i in dimensions:
             optspace[i] = cfg.optspace[i]
 
-        # get experiments that match ?????
+        # get experiments that match
         space = utils.groupBy(elements, optspace)
 
-        oFile = cfg.sum_output_dir + '/' + core.get_name(s['name'], group)
+        oFile = cfg.sum_output_dir + '/' + core.get_name(name, group)
 
         # prepare columns and sizes for print
         other_cols = ["entries", "files"]
-        cols = s['dimensions'] + other_cols
+        cols = dimensions + other_cols
         cols_sz = []
-        for dimension in s['dimensions']:
+        for dimension in dimensions:
             lengths = map(lambda x: len(str(x)), optspace[dimension])
             lengths.append(len(dimension))
             cols_sz.append(max(lengths))
@@ -62,13 +76,20 @@ def summarize_one(cfg, s, experiments, backend,
         f = summary_backends.backend_constructor(backend)(oFile)
 
         # write header
-        if s.has_key('header'):
+        if is_new(s):
+            header = ''
+            # get one point and look the dimensions
+            (point, samples) = space[0]
+            header = s.header(point.keys())
+            if header:
+                f.write_header(header)
+        elif s.has_key('header'):
             header = ""
             # get one point and look the dimensions
             (point, samples) = space[0]
-            dimensions = point.keys()
-            dimensions.sort()
-            for d in dimensions:
+            dims = point.keys()
+            dims.sort()
+            for d in dims:
                 header += d + ' '
 
             header = s['header'](header)
@@ -87,7 +108,10 @@ def summarize_one(cfg, s, experiments, backend,
                     os.chdir(outputFolder)
                     outf = open(core.outputFile)
                     # call process
-                    s['process'](point, outf, f, wd + '/' + cfg.sum_output_dir)
+                    if is_new(s):
+                        s.visit(point, outf, f)
+                    else:
+                        s['process'](point, outf, f, wd + '/' + cfg.sum_output_dir)
                     outf.close()
                     os.chdir(wd)
         f.close()
@@ -99,7 +123,10 @@ def summarize(cfg, experiments, sel = [], backend = 'file',
     # TODO check if exists
     if sel == []:
         for s in cfg.summaries:
-            sel.append(s['name'])
+            if is_new(s):
+                sel.append(s.name())
+            else:
+                sel.append(s['name'])
 
     # check output folder
     utils.checkFolder(cfg.sum_output_dir)
@@ -107,11 +134,17 @@ def summarize(cfg, experiments, sel = [], backend = 'file',
     for summary in cfg.summaries:
         #if summary.has_key('preprocess'):
         #    preprocess_one(cfg, summary)
-        if summary['name'] in sel:
-            summarize_one(cfg, summary, experiments, backend,
-                          ignore_status)
-            sel.remove(summary['name'])
-
+        if is_new(summary):
+            if summary.name() in sel:
+                summarize_one(cfg, summary, experiments, backend,
+                              ignore_status)
+                sel.remove(summary.name())
+        else:
+            if summary['name'] in sel:
+                summarize_one(cfg, summary, experiments, backend,
+                              ignore_status)
+                sel.remove(summary['name'])
+                
     for s in sel:
         print s, "not valid"
 
@@ -131,14 +164,17 @@ def check_cfg(cfg):
     for s in cfg.summaries:
         if type(s) == dict:
             summ.append(s)
-        else:
+        elif hasattr(s, 'as_dict'):
             summ.append(s.as_dict(cfg))
+        else:
+            summ.append(s)
     cfg.summaries = summ
     for s in cfg.summaries:
-        assert type(s) == dict
-        assert s.has_key('name')
-        assert s.has_key('dimensions')
-        assert s.has_key('groupby')
-        # optional assert s.has_key('preprocess')
-        assert s.has_key('process')
-        assert s.has_key('header')
+        assert type(s) == dict or is_new(s) # by inheritance ok
+        if type(s) == dict:
+            assert s.has_key('name')
+            assert s.has_key('dimensions')
+            assert s.has_key('groupby')
+            # optional assert s.has_key('preprocess')
+            assert s.has_key('process')
+            assert s.has_key('header')
