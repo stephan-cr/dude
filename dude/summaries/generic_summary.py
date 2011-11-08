@@ -16,6 +16,9 @@ class LineSelect:
         self.regex  = regex
         self.split  = split
 
+    def name(self):
+        return self.name
+
     def proc(self, optpt, stdout, summary, folder):
         keys = optpt.keys()
         keys.sort()
@@ -71,6 +74,8 @@ class FilesLineSelect:
         self.has_header = has_header
         self.quiet = quiet
 
+    def name(self):
+        return self.name
 
     def proc(self, optpt, stdout, summary, folder):
         keys = optpt.keys()
@@ -135,6 +140,9 @@ class MultiLineSelect:
         self.groupby = groupby
         self.filters   = filters
 
+    def name(self):
+        return self.name
+
     def proc(self, optpt, stdout, summary, folder):
         keys = optpt.keys()
         keys.sort()
@@ -195,6 +203,9 @@ class FilesMultiLineSelect:
         self.files   = files
         self.fname_split = fname_split
         self.fname_header = fname_header
+
+    def name(self):
+        return self.name
 
     def proc(self, optpt, stdout, summary, folder):
         keys = optpt.keys()

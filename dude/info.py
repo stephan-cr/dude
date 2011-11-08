@@ -52,7 +52,7 @@ def show_info(cfg):
         print 'Experiments: complete space'
     else:
         print 'Experiments: constrained space'
-    print 'Summaries  :', [summ['name'] for summ in cfg.summaries]
+    print 'Summaries  :', [(summ['name'] if type(summ) == dict else summ.name()) for summ in cfg.summaries]
     if hasattr(cfg, 'filters'):
         print 'Filters    :', [fil for fil in cfg.filters]
     print "Timeout    :", cfg.timeout
