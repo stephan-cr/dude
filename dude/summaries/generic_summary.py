@@ -10,14 +10,14 @@ import glob
 class LineSelect:
     def __init__(self, name, groupby = [], header = None,
                  regex = '.*', split = (lambda line: line) ):
-        self.name = name
+        self._name = name
         self.groupby = groupby
         self.header = header
         self.regex  = regex
         self.split  = split
 
     def name(self):
-        return self.name
+        return self._name
 
     def proc(self, optpt, stdout, summary, folder):
         keys = optpt.keys()
@@ -39,7 +39,7 @@ class LineSelect:
 
     def as_dict(self, cfg):
         s = {
-            'name' : self.name,
+            'name' : self.name(),
             'dimensions' : cfg.optspace.keys(),
             'groupby' : self.groupby,
             'process' : lambda a,b,c,d: LineSelect.proc(self, a, b, c, d)
@@ -63,7 +63,7 @@ class FilesLineSelect:
                  has_header=False,
                  quiet = False
                  ):
-        self.name = name
+        self._name = name
         self.groupby = groupby
         self.header = header
         self.regex  = regex
@@ -75,7 +75,7 @@ class FilesLineSelect:
         self.quiet = quiet
 
     def name(self):
-        return self.name
+        return self._name
 
     def proc(self, optpt, stdout, summary, folder):
         keys = optpt.keys()
@@ -108,7 +108,7 @@ class FilesLineSelect:
 
     def as_dict(self, cfg):
         s = {
-            'name' : self.name,
+            'name' : self.name(),
             'dimensions' : cfg.optspace.keys(),
             'groupby' : self.groupby,
             'process' : lambda a,b,c,d: FilesLineSelect.proc(self, a, b, c, d)
@@ -136,12 +136,12 @@ class FilesLineSelect:
 class MultiLineSelect:
     def __init__(self, name, groupby = [],
                  filters = [("", '.*', (lambda line: line))] ):
-        self.name    = name
+        self._name    = name
         self.groupby = groupby
         self.filters   = filters
 
     def name(self):
-        return self.name
+        return self._name
 
     def proc(self, optpt, stdout, summary, folder):
         keys = optpt.keys()
@@ -178,7 +178,7 @@ class MultiLineSelect:
 
     def as_dict(self, cfg):
         s = {
-            'name' : self.name,
+            'name' : self.name(),
             'dimensions' : cfg.optspace.keys(),
             'groupby' : self.groupby,
             'process' : lambda a,b,c,d: MultiLineSelect.proc(self, a, b, c, d)
@@ -197,7 +197,7 @@ class FilesMultiLineSelect:
                  fname_split = (lambda fname: fname),
                  fname_header = None
                  ):
-        self.name    = name
+        self._name    = name
         self.groupby = groupby
         self.filters = filters
         self.files   = files
@@ -205,7 +205,7 @@ class FilesMultiLineSelect:
         self.fname_header = fname_header
 
     def name(self):
-        return self.name
+        return self._name
 
     def proc(self, optpt, stdout, summary, folder):
         keys = optpt.keys()
@@ -252,7 +252,7 @@ class FilesMultiLineSelect:
 
     def as_dict(self, cfg):
         s = {
-            'name' : self.name,
+            'name' : self.name(),
             'dimensions' : cfg.optspace.keys(),
             'groupby' : self.groupby,
             'process' : lambda a,b,c,d: FilesMultiLineSelect.proc(self, a, b, c, d)
