@@ -4,14 +4,20 @@
 # Distributed under the MIT License
 # See accompanying file LICENSE
 
-from distutils.core import setup
+try:
+    from setuptools import setup
+except ImportError:
+    # fall back to standard distutils
+    from distutils.core import setup
+
 from dude import __version__
+
 setup(name='dude',
       version=__version__,
       description='dude - experimentation framework',
       author='Diogo Becker',
       packages=['dude', 'dude.summaries'],
       scripts=['scripts/dude'],
-      license = 'MIT License'
+      license='MIT License',
+      url='http://bitbucket.org/db7/dude'
       )
-
