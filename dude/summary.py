@@ -83,7 +83,7 @@ def summarize_one(cfg, s, experiments, backend,
             header = s.header(point.keys())
             if header:
                 f.write_header(header)
-        elif s.has_key('header'):
+        elif 'header' in s:
             header = ""
             # get one point and look the dimensions
             (point, samples) = space[0]
@@ -132,7 +132,7 @@ def summarize(cfg, experiments, sel = [], backend = 'file',
     utils.checkFolder(cfg.sum_output_dir)
 
     for summary in cfg.summaries:
-        #if summary.has_key('preprocess'):
+        #if 'preprocess' in summary:
         #    preprocess_one(cfg, summary)
         if is_new(summary):
             if summary.name() in sel:
@@ -144,7 +144,7 @@ def summarize(cfg, experiments, sel = [], backend = 'file',
                 summarize_one(cfg, summary, experiments, backend,
                               ignore_status)
                 sel.remove(summary['name'])
-                
+
     for s in sel:
         print s, "not valid"
 
@@ -172,9 +172,9 @@ def check_cfg(cfg):
     for s in cfg.summaries:
         assert type(s) == dict or is_new(s) # by inheritance ok
         if type(s) == dict:
-            assert s.has_key('name')
-            assert s.has_key('dimensions')
-            assert s.has_key('groupby')
-            # optional assert s.has_key('preprocess')
-            assert s.has_key('process')
-            assert s.has_key('header')
+            assert 'name' in s
+            assert 'dimensions' in s
+            assert 'groupby' in s
+            # optional assert 'preprocess' in s
+            assert 'process' in s
+            assert 'header' in s

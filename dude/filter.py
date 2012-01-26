@@ -72,7 +72,7 @@ def filter_inline(cfg, filters, invert, only_ran=True):
         flts.append((key,value))
 
         # add optpt to optspace if it does not exist
-        if not cfg.optspace.has_key(key):
+        if key not in cfg.optspace:
             cfg.optspace[key] = []
 
         for v in value:

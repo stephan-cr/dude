@@ -59,7 +59,7 @@ def matchLeft(left, right):
 def select(options, selection):
     s = {}
     for k in selection:
-        assert options.has_key(k)
+        assert k in options
         s[k] = options[k]
     return s
 
