@@ -1,4 +1,4 @@
-# Copyright (c) 2011 Stephan Creutz
+# Copyright (c) 2011, 2012 Stephan Creutz
 # Distributed under the MIT License
 # See accompanying file LICENSE
 
@@ -26,7 +26,7 @@ class MetaData:
         saves metadata of the experiment
         '''
 
-        meta_file = open(raw_folder + '/meta.tmp', 'w')
+        meta_file = open(raw_folder + '/meta.tmp', 'wb')
         cPickle.dump(self, meta_file, 2)
         os.fsync(meta_file)
         meta_file.close()
@@ -44,7 +44,7 @@ def read_meta(cfg):
 
     meta_file = None
     try:
-        meta_file = open(core.get_raw_folder(cfg) + '/' + META_FILE, 'r')
+        meta_file = open(core.get_raw_folder(cfg) + '/' + META_FILE, 'rb')
 
         return cPickle.load(meta_file)
     except IOError:
@@ -166,4 +166,3 @@ def check_cfg(cfg):
     assert type(cfg.optspace) == dict
 
     assert hasattr(cfg, 'raw_output_dir')
-
