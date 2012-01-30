@@ -78,7 +78,9 @@ You can use any tool you want to further process the final summaries.
 Documentation
 -------------
 
-**TODO** how to read the documentation
+More details can be found in the `full documentation`_.
+
+.. _full documentation: http://dude.readthedocs.org.
 
 Contribute
 ----------
