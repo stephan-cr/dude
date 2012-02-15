@@ -51,10 +51,10 @@ parser.add_option("-y", "--filter-inline",
                   dest = "filter_inline", metavar = "FILTERS",
                   help = "select experiments using inline filters separated by semicolons"
                   "\ne.g. -y \"option1=value;option2=[value3,value4]\"")
-parser.add_option("-u", "--filter-path",
+parser.add_option("-p", "--filter-path",
                   dest = "filter_path", metavar = "PATH",
                   help = "select experiments starting with PATH"
-                  "\ne.g. -u \"raw/exp__optionXvalY\"")
+                  "\ne.g. -p \"raw/exp__optionXvalY\"")
 parser.add_option("-i",  "--invert-filters", default = False,
                   dest = "invert", action = "store_true",
                   help = "invert filter selection")
@@ -95,6 +95,9 @@ parser.add_option_group(group3)
 parser.add_option_group(group4)
 
 def main(cargs):
+    # folder from where dude is called
+    cfolder = os.getcwd()
+
     # parse command line
     (options, cargs) = parser.parse_args(cargs)
 
@@ -123,12 +126,26 @@ def main(cargs):
             parser.print_help()
             sys.exit(1)
     else: # try default file names
-        for f in ['desc.py', 'dudefile', 'Dudefile', 'dudefile.py']:
-            try:
-                cfg = imp.load_source('', f)
+        current = os.getcwd()
+        max_folder = 10  # arbitrary number of parent directories
+        i = 0
+        while i < max_folder:
+            for f in ['desc.py', 'dudefile', 'Dudefile', 'dudefile.py']:
+                try:
+                    if os.path.exists(f) and i > 0:
+                        print "Opening Dudefile: ", os.path.abspath(f)
+                    cfg = imp.load_source('', f)
+                    break
+                except IOError:
+                    pass
+            if cfg != None: 
                 break
-            except IOError:
-                pass
+            else:
+                i += 1
+                parent, last = os.path.split(current)
+                os.chdir(parent)
+                current = parent
+
         if cfg == None:
             print >> sys.stderr, 'ERROR: no dudefile found'
             parser.print_help()
@@ -164,8 +181,18 @@ def main(cargs):
                                          options.filter_inline,
                                          options.invert, False)
     elif options.filter_path:
+        current = os.getcwd()
+        if current != cfolder:
+            # this assumes Dudefile is in the root of the experiment folder
+            os.chdir(cfolder)
+            path = os.path.abspath(options.filter_path)
+            os.chdir(current)
+            path = os.path.relpath(path) # get raw_output_dir/exp_... format
+        else:
+            path = options.filter_path
+
         experiments = filt.filter_experiments(cfg,
-                                              filt.filter_path(cfg, options.filter_path),
+                                              filt.filter_path(cfg, path),
                                               options.invert, False)
     else:
         experiments = core.get_experiments(cfg)
