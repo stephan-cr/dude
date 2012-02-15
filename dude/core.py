@@ -1,4 +1,4 @@
-# Copyright (c) 2010, 2011 Diogo Becker
+# Copyright (c) 2010, 2011, 2012 Diogo Becker
 # Distributed under the MIT License
 # See accompanying file LICENSE
 
@@ -53,10 +53,11 @@ def get_name(prefix, optpt):
         s+=''.join(st.split('/'))
     return  s
 
-def get_folder(cfg, experiment):
+def get_folder(cfg, experiment, check = True):
     """Returns the experiment folder. Creates it if necessary."""
     folder = get_raw_folder(cfg)
-    utils.checkFolder(folder)
+    if check:
+        utils.checkFolder(folder)
 
     # add experiment subfolder
     folder += '/' + get_name('exp', experiment)

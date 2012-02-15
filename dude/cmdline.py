@@ -1,4 +1,4 @@
-# Copyright (c) 2011 Diogo Becker
+# Copyright (c) 2011, 2012 Diogo Becker
 # Distributed under the MIT License
 # See accompanying file LICENSE
 
@@ -51,6 +51,10 @@ parser.add_option("-y", "--filter-inline",
                   dest = "filter_inline", metavar = "FILTERS",
                   help = "select experiments using inline filters separated by semicolons"
                   "\ne.g. -y \"option1=value;option2=[value3,value4]\"")
+parser.add_option("-u", "--filter-path",
+                  dest = "filter_path", metavar = "PATH",
+                  help = "select experiments starting with PATH"
+                  "\ne.g. -u \"raw/exp__optionXvalY\"")
 parser.add_option("-i",  "--invert-filters", default = False,
                   dest = "invert", action = "store_true",
                   help = "invert filter selection")
@@ -159,6 +163,10 @@ def main(cargs):
         experiments = filt.filter_inline(cfg,
                                          options.filter_inline,
                                          options.invert, False)
+    elif options.filter_path:
+        experiments = filt.filter_experiments(cfg,
+                                              filt.filter_path(cfg, options.filter_path),
+                                              options.invert, False)
     else:
         experiments = core.get_experiments(cfg)
 
