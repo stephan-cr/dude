@@ -2,6 +2,9 @@
 # Distributed under the MIT License
 # See accompanying file LICENSE
 
+"""
+Utility functions to handle lists and dictionaries.
+"""
 import os
 import sys
 
@@ -62,6 +65,18 @@ def select(options, selection):
         assert k in options
         s[k] = options[k]
     return s
+
+def chop(l, r):
+    """
+    Removes from list `l` all items in the intersection between lists `l` and `r`.
+    """
+    assert type(l) == list
+    assert type(r) == list
+    q = l[:] # [:] copies a list
+    for e in r:
+        q.remove(e)
+    return q
+
 
 
 # Mean class
