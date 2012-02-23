@@ -53,7 +53,15 @@ def summarize_one(cfg, s, experiments, backend,
             optspace[i] = cfg.optspace[i]
 
         # get experiments that match
-        space = utils.groupBy(elements, optspace)
+
+        if len(groupby) == 0: # hack to speed up normal path
+            space = []
+            for e in elements:
+                x = {}
+                for k in e: x[k] = str(e[k])
+                space.append((x, [e]))
+        else:
+            space = utils.groupBy(elements, optspace)
 
         oFile = cfg.sum_output_dir + '/' + core.get_name(name, group)
 
