@@ -14,7 +14,7 @@ def clean_experiments(cfg, experiments):
         shutil.rmtree(folder)
 
 def clean_experiment(folder):
-    status_file = folder+'/dude.status'
+    status_file = os.path.join(folder, 'dude.status')
     if os.path.exists(status_file):
         print "Cleaning", folder
         os.remove(status_file)

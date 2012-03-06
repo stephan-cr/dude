@@ -49,9 +49,9 @@ def get_name(prefix, optpt):
     l.sort()
     for k in l:
         s += SEP + k
-        st=''.join(str(optpt[k]).split(' '))
-        s+=''.join(st.split('/'))
-    return  s
+        st = ''.join(str(optpt[k]).split(' '))
+        s += ''.join(os.path.split(st))
+    return s
 
 def get_folder(cfg, experiment, check = True):
     """Returns the experiment folder. Creates it if necessary."""
@@ -60,17 +60,17 @@ def get_folder(cfg, experiment, check = True):
         utils.checkFolder(folder)
 
     # add experiment subfolder
-    folder += '/' + get_name('exp', experiment)
+    folder = os.path.join(folder, get_name('exp', experiment))
     utils.checkFolder(folder)
     return folder
 
 def exist_status_file(folder):
     """Checks if status file exist for a given experiment"""
-    return os.path.exists(folder + '/' + statusFile)
+    return os.path.exists(os.path.join(folder, statusFile))
 
 def read_status_file(folder):
     """Reads value of status file for a given experiment"""
-    f = open(folder + '/' + statusFile, 'r')
+    f = open(os.path.join(folder, statusFile), 'r')
     val = int(f.readline())
     f.close()
     return val
@@ -79,8 +79,8 @@ def read_status_file(folder):
 def experiment_success(cfg, experiment):
     """Checks if experiment ran correctly"""
     outputFolder = get_folder(cfg, experiment)
-    oFile   = outputFolder + '/' + outputFile
-    sFile   = outputFolder + '/' + statusFile
+    oFile   = os.path.join(outputFolder, outputFile)
+    sFile   = os.path.join(outputFolder, statusFile)
 
     if not os.path.exists(oFile) or not os.path.exists(sFile):
         # it didn't run yet, return None
@@ -101,8 +101,8 @@ def experiment_success(cfg, experiment):
 def experiment_ran(cfg, experiment):
     """Checks if experiment ran"""
     outputFolder = get_folder(cfg, experiment)
-    oFile   = outputFolder + '/' + outputFile
-    sFile   = outputFolder + '/' + statusFile
+    oFile   = os.path.join(outputFolder, outputFile)
+    sFile   = os.path.join(outputFolder, statusFile)
 
     if not os.path.exists(oFile) or not os.path.exists(sFile):
         return False
@@ -116,8 +116,8 @@ def get_failed(cfg, missing = False):
     experiments = get_experiments(cfg)
     for exp in experiments:
         outputFolder = get_folder(cfg, exp)
-        oFile   = outputFolder + '/' + outputFile
-        sFile   = outputFolder + '/' + statusFile
+        oFile   = os.path.join(outputFolder, outputFile)
+        sFile   = os.path.join(outputFolder, statusFile)
 
         if not os.path.exists(sFile):
             if missing:

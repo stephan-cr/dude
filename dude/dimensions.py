@@ -26,12 +26,12 @@ class MetaData:
         saves metadata of the experiment
         '''
 
-        meta_file = open(raw_folder + '/meta.tmp', 'wb')
+        meta_file = open(os.path.join(raw_folder, 'meta.tmp'), 'wb')
         cPickle.dump(self, meta_file, 2)
         os.fsync(meta_file)
         meta_file.close()
-        os.rename(raw_folder + '/meta.tmp',
-                  raw_folder + '/' + META_FILE)
+        os.rename(os.path.join(raw_folder, 'meta.tmp'),
+                  os.path.join(raw_folder, META_FILE))
 
     def __str__(self):
         return ', '.join([str(attr) for attr in [self.optspace,
@@ -44,7 +44,7 @@ def read_meta(cfg):
 
     meta_file = None
     try:
-        meta_file = open(core.get_raw_folder(cfg) + '/' + META_FILE, 'rb')
+        meta_file = open(os.path.join(core.get_raw_folder(cfg), META_FILE), 'rb')
 
         return cPickle.load(meta_file)
     except IOError:

@@ -63,7 +63,7 @@ class JsonSumBackend:
         for i in range(len(self.__dimensions)):
             subdoc = subdoc.setdefault(self.__header[i], {})
             subdoc = subdoc.setdefault(values[i], {})
-            
+
         for j in range(len(self.__header) - len(self.__dimensions)):
             subdoc[self.__header[len(self.__dimensions) + j]] = values[len(self.__dimensions) + j]
 
@@ -94,7 +94,7 @@ class Sqlite3SumBackend:
         else:
             cols = header
 
-        table_name = self.__name.split('/')[-1]
+        table_name = self.__name.split(os.path.sep)[-1]
 
         # check if table already exists
         # SQLite FAQ: http://www.sqlite.org/faq.html#q7
@@ -118,7 +118,7 @@ select count(name) from sqlite_master where type=\'table\' and name=?;''',
             return
 
         self.__cursor.execute('insert into %s values (%s);' %
-                              (self.__name.split('/')[-1],
+                              (self.__name.split(os.path.sep)[-1],
                                ', '.join(['\'' + str(arg) + '\''
                                           for arg in args])))
 

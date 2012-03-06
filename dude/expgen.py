@@ -40,18 +40,18 @@ def finish_exp(optpt, status):
 
 import dude.summaries
 sum = dude.summaries.LineSelect (
-	name   = 'example_summary',
+        name   = 'example_summary',
         regex  = '.*',
         split  = (lambda l: l.split(':')[1]),
         header = "result"
-	)
+        )
 
 summaries = [sum]
 """
 
 
 def __create_dfile(folder, expname):
-    f = open(folder + '/Dudefile', 'w')
+    f = open(os.path.join(folder, 'Dudefile'), 'w')
     f.write(string.Template(dfile).substitute({'expname':expname}))
     f.close()
 

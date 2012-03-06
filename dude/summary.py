@@ -55,7 +55,7 @@ def summarize_one(cfg, s, experiments, backend,
         # get experiments that match
         space = utils.groupBy(elements, optspace)
 
-        oFile = cfg.sum_output_dir + '/' + core.get_name(name, group)
+        oFile = os.path.join(cfg.sum_output_dir, core.get_name(name, group))
 
         # prepare columns and sizes for print
         other_cols = ["entries", "files"]
@@ -111,7 +111,7 @@ def summarize_one(cfg, s, experiments, backend,
                     if is_new(s):
                         s.visit(point, outf, f)
                     else:
-                        s['process'](point, outf, f, wd + '/' + cfg.sum_output_dir)
+                        s['process'](point, outf, f, os.path.join(wd, cfg.sum_output_dir))
                     outf.close()
                     os.chdir(wd)
         f.close()

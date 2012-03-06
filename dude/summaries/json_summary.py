@@ -14,7 +14,7 @@ class JsonSelect(SummaryBase):
         SummaryBase.__init__(self, name, groupby, header)
         if type(path) == list:
             self.paths = path
-        else: 
+        else:
             self.paths = [path]
         assert len(header.split(' ')) == len(self.paths)
         self.filename = filename
@@ -25,11 +25,11 @@ class JsonSelect(SummaryBase):
                 print "JsonSelect:", optpt
             f = open(self.filename)
             jobj = json.load(f)
-            
+
             objs = []
             for path in self.paths:
                 jobj_tmp = jobj
-                for x in path.split('/'):
+                for x in path.split(os.path.sep):
                     jobj_tmp = jobj_tmp[x]
                 objs.append(jobj_tmp)
 
