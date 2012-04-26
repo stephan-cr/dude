@@ -77,20 +77,17 @@ def summarize_one(cfg, s, experiments, backend,
 
         # write header
         if is_new(s):
-            header = ''
             # get one point and look the dimensions
             (point, samples) = space[0]
             header = s.header(point.keys())
             if header:
                 f.write_header(header)
         elif 'header' in s:
-            header = ""
             # get one point and look the dimensions
             (point, samples) = space[0]
             dims = point.keys()
             dims.sort()
-            for d in dims:
-                header += d + ' '
+            header = ' '.join(dims) + ' '
 
             header = s['header'](header)
             f.write_header(header)
