@@ -1,4 +1,4 @@
-# Copyright (c) 2010, 2011 Diogo Becker, Stephan Creutz
+# Copyright (c) 2010, 2011, 2012 Diogo Becker, Stephan Creutz
 # Distributed under the MIT License
 # See accompanying file LICENSE
 
@@ -42,7 +42,7 @@ class LineSelect:
             'name' : self.name(),
             'dimensions' : cfg.optspace.keys(),
             'groupby' : self.groupby,
-            'process' : lambda a,b,c,d: LineSelect.proc(self, a, b, c, d)
+            'process' : self.proc
             }
         if self.header == None:
             s['header'] = lambda h: ""
@@ -111,7 +111,7 @@ class FilesLineSelect:
             'name' : self.name(),
             'dimensions' : cfg.optspace.keys(),
             'groupby' : self.groupby,
-            'process' : lambda a,b,c,d: FilesLineSelect.proc(self, a, b, c, d)
+            'process' : self.proc
             }
         if self.header == None:
             s['header'] = lambda h: ""
@@ -181,7 +181,7 @@ class MultiLineSelect:
             'name' : self.name(),
             'dimensions' : cfg.optspace.keys(),
             'groupby' : self.groupby,
-            'process' : lambda a,b,c,d: MultiLineSelect.proc(self, a, b, c, d)
+            'process' : self.proc
             }
         header = []
         for (h,r,x) in self.filters:
@@ -255,7 +255,7 @@ class FilesMultiLineSelect:
             'name' : self.name(),
             'dimensions' : cfg.optspace.keys(),
             'groupby' : self.groupby,
-            'process' : lambda a,b,c,d: FilesMultiLineSelect.proc(self, a, b, c, d)
+            'process' : self.proc
             }
         header = []
         for (h,r,x) in self.filters:
