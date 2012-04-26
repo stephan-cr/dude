@@ -44,15 +44,13 @@ class LineSelect:
             'groupby' : self.groupby,
             'process' : self.proc
             }
-        if self.header == None:
+        if self.header is None:
             s['header'] = lambda h: ""
         elif type(self.header) == str:
             s['header'] = lambda h: h + self.header
         else:
             s['header'] = self.header
         return s
-
-
 
 class FilesLineSelect:
     """ Document this!!! """
@@ -113,10 +111,10 @@ class FilesLineSelect:
             'groupby' : self.groupby,
             'process' : self.proc
             }
-        if self.header == None:
+        if self.header is None:
             s['header'] = lambda h: ""
         elif type(self.header) == str:
-            if self.fname_header == None:
+            if self.fname_header is None:
                 s['header'] = lambda h: h  + ' file ' + self.header
             else:
                 s['header'] = lambda h: h  + self.fname_header + ' ' + self.header
@@ -131,7 +129,6 @@ class FilesLineSelect:
         os.chdir(folder)
         self.proc(optpt, None, fd, None)
         os.chdir(wd)
-
 
 class MultiLineSelect:
     def __init__(self, name, groupby = [],
@@ -154,24 +151,19 @@ class MultiLineSelect:
         for l in stdout.readlines():
             if v == []:
                 # reserve place for pairs
-                for i in range(0, len(self.filters)):
-                    v.append(None)
+                v = [None] * len(self.filters)
             # check for this line if any of regex matches
             for i in range(0, len(self.filters)):
                 (header, regex, split) = self.filters[i]
                 if re.match(regex, l):
                     # check if position is empty
-                    assert v[i] == None
+                    assert v[i] is None
 
                     # add value to position
                     v[i] = split(l[:-1])
-                    assert v[i] != None
+                    assert v[i] is not None
 
-            complete = True
-            for p in v:
-                if p == None:
-                    complete = False
-                    break
+            complete = not (None in v)
             if complete:
                 print >>summary, s + " ".join(v)
                 v = []
@@ -214,7 +206,6 @@ class FilesMultiLineSelect:
         for k in keys:
             s += optpt[k] + ' '
 
-
         if type(self.files) == str:
             files = glob.glob(self.files)
         else:
@@ -224,29 +215,25 @@ class FilesMultiLineSelect:
         for fn in files:
             f = open(fn)
             v = []
+            fname_split = self.fname_split(fn)
             for l in f:
                 if v == []:
                     # reserve place for pairs
-                    for i in range(0, len(self.filters)):
-                        v.append(None)
+                    v = [None] * len(self.filters)
                 # check for this line if any of regex matches
                 for i in range(0, len(self.filters)):
                     (header, regex, split) = self.filters[i]
                     if re.match(regex, l):
                         # check if position is empty
-                        assert v[i] == None
+                        assert v[i] is None
 
                         # add value to position
                         v[i] = split(l[:-1])
-                        assert v[i] != None
+                        assert v[i] is not None
 
-                complete = True
-                for p in v:
-                    if p == None:
-                        complete = False
-                        break
+                complete = not (None in v)
                 if complete:
-                    print >>summary, s + ' ' + self.fname_split(fn) + ' ' + " ".join(v)
+                    print >>summary, s + ' ' + fname_split + ' ' + ' '.join(v)
                     v = []
             f.close()
 
@@ -261,7 +248,7 @@ class FilesMultiLineSelect:
         for (h,r,x) in self.filters:
             header.append(h)
         header = " ".join(header)
-        if self.fname_header == None:
+        if self.fname_header is None:
             s['header'] = lambda h: h  + ' file ' + header
         else:
             s['header'] = lambda h: h  + self.fname_header + ' ' + header
