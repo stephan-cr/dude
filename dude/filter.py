@@ -81,15 +81,6 @@ def filter_inline(cfg, filters, invert, only_ran=True):
 
     return filter_experiments(cfg, [(lambda a, b: generic_filter(a,b,flts))], invert, only_ran)
 
-def generic_filter(experiment, outf, filters):
-    for key, value in filters:
-        assert type(key) == str
-        assert type(value) == list
-
-        if not utils.parse_value(experiment[key]) in value:
-            return False
-    return True
-
 def filter_path(cfg, path):
     def foo(optpt, outf):
         if core.get_folder(cfg, optpt, check = False) == path:
