@@ -27,7 +27,7 @@ optspace = {
     'runs'      : range(3)
 }
 
-# order experiments according to the following comparison function
+# order experiments according to the following comparison function (optional)
 
 def optpt_cmp(optpt1, optpt2):
     return cmp(optpt1, optpt2)

@@ -47,8 +47,8 @@ give you a rough outline.
 
 To work with Dude you first have to create a *Dudefile* where you
 describe a set of experiments and how to summarize the data produced
-by these experiments. Dude has a command to create a Dudefile template
-for you::
+by these experiments (the "examples" subdirectory may help you). Dude
+has a command to create a Dudefile template for you::
 
     % dude create <directory where you want to run your experiments>
 
