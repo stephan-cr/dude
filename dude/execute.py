@@ -32,9 +32,11 @@ class SpawnProcess:
         self.stderr = stderr
 
     def kill(self):
-        os.killpg(self.proc.pid, signal.SIGKILL)
+        try:
+            os.killpg(self.proc.pid, signal.SIGKILL)
+        except OSError, e:
+	    print "Ignoring exception:", e
         self.status = self.proc.wait()
-        self.proc = None
 
     def poll(self):
         if self.status:
@@ -55,6 +57,7 @@ class SpawnProcess:
                                      stdout = self.stderr,
                                      preexec_fn = os.setsid
                                      )
+        assert self.proc != None
 
 class ForkProcess:
     """Fork process and start a experiment."""
