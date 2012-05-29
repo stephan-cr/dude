@@ -21,8 +21,8 @@ from dude import __author__
 from dude import __version__
 from dude import __copyright__
 
-__version__ = "3.0"
-__copyright__ = "2011"
+#__version__ = __version__
+#__copyright__ = "2011"
 
 # -- General configuration -----------------------------------------------------
 
@@ -31,7 +31,8 @@ __copyright__ = "2011"
 
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = ['sphinx.ext.autodoc', 'sphinx.ext.doctest', 'sphinx.ext.coverage', 'sphinx.ext.viewcode',
+extensions = ['sphinx.ext.autodoc', 'sphinx.ext.doctest', 'sphinx.ext.coverage', 
+              'sphinx.ext.viewcode',
               'sphinx.ext.doctest']
 
 # Add any paths that contain templates here, relative to this directory.
@@ -154,7 +155,7 @@ html_static_path = ['_static']
 #html_split_index = False
 
 # If true, links to the reST sources are added to the pages.
-#html_show_sourcelink = True
+html_show_sourcelink = False
 
 # If true, "Created using Sphinx" is shown in the HTML footer. Default is True.
 #html_show_sphinx = True
