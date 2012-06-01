@@ -35,7 +35,7 @@ class SpawnProcess:
         try:
             os.killpg(self.proc.pid, signal.SIGKILL)
         except OSError, e:
-	    print "Ignoring exception:", e
+            print "Ignoring exception:", e
         self.status = self.proc.wait()
 
     def poll(self):
