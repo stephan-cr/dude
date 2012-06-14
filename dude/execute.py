@@ -113,6 +113,8 @@ class ForkProcess:
         except Exception, e:
             print "Exception in fork_cmd:"
             print '#'*60
+            print "", e
+            print '~'*60
             traceback.print_exc(file=sys.stdout)
             print '#'*60
             os._exit(2)
