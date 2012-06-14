@@ -66,6 +66,14 @@ def select(options, selection):
         s[k] = options[k]
     return s
 
+def unselect(options, unselection):
+    s = {}
+    assert type(unselection) == list
+    for k in options.keys():
+        if k not in unselection:
+          s[k] = options[k]
+    return s
+    
 def chop(l, r):
     """
     Removes from list `l` all items in the intersection between lists `l` and `r`.
