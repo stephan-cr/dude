@@ -65,17 +65,72 @@ If the experiment times out, it is killed by Dude.
 Similarly, if the user presses "ctrl-c", any running experiment is immediately killed.
 
 
-Prepare and finish
-------------------
-
-.. _prepare_exp:
-
-Prepare_exp
-
+.. _summaries:
 
 Summaries
 ---------
 
+Summaries are used to extract information from executions. 
+Summaries are usually used to perform simple aggregations only; tools such as Gnuplot, matplotlib and R can be used for further aggregation, analysis and plotting.
+
+Summaries are added to the ``summaries`` variables in a Dudefile, for example::
+
+      import dude.summaries
+      summaries = [ dude.summaries.LineSelect('my_summary') ]
+
+
+Since version Dude 3.1 summaries inherit a single SummaryBase class. All the following parameters are available in any summary.
+
+
+.. autoclass:: dude.summaries.SummaryBase
+   :members:
+
+Summaries can either process output from the stdout/stderr of a program execution or from files generated during the execution.
+
+stdout/stderr summaries
+~~~~~~~~~~~~~~~~~~~~~~~
+
+LineSelect and MultiLineSelect 
+
+.. autoclass:: dude.summaries.LineSelect
+   :members:
+   :inherited-members:
+
+.. autoclass:: dude.summaries.MultiLineSelect
+   :members:
+   :inherited-members:
+
+file summaries
+~~~~~~~~~~~~~~
+
+.. autoclass:: dude.summaries.FilesLineSelect
+   :members:
+   :inherited-members:
+
+.. autoclass:: dude.summaries.FilesMultiLineSelect
+   :members:
+   :inherited-members:
+
+other summaries
+~~~~~~~~~~~~~~~
+
+.. autoclass:: dude.summaries.JsonSelect
+   :members:
+   :inherited-members:
+
+Backends
+~~~~~~~~
+
+Over time some different backends turned out to be useful.
+Dude supports file, json and sqlite backends.
+
+
+.. _prepare_exp:
+
+Prepare and finish
+------------------
+
+Prepare_exp
 
 Other stuff
 ===========
@@ -84,13 +139,14 @@ Filters
 -------
 
 Inline filters
-^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~
 
 Complex filters
-^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~
 
 Running "once"
 --------------
 
 Spawn or fork
 -------------
+
