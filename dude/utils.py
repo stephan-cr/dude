@@ -223,6 +223,7 @@ class Tee(object):
         self.file   = open(name, mode)
         self.stdout = sys.stdout
         #sys.stdout  = self
+        self.fileno = self.stdout.fileno
 
     def __del__(self):
         sys.stdout  = self.stdout
