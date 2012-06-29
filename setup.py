@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-# Copyright (c) 2010 Diogo Becker
+# Copyright (c) 2010,2012 Diogo Becker and Stephan Creutz
 # Distributed under the MIT License
 # See accompanying file LICENSE
 
@@ -74,7 +74,7 @@ setup(name='dude',
       version=dude_version,
       description='dude - experimentation framework',
       author='Diogo Becker',
-      packages=['dude', 'dude.summaries'],
+      packages=['dude'],
       scripts=['scripts/dude'],
       license='MIT License',
       url='http://bitbucket.org/db7/dude',
