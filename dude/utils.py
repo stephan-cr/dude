@@ -220,6 +220,7 @@ def parse_str_list(l):
 
 class Tee(object):
     def __init__(self, name, mode):
+        """BUG: fileno is necessary when for Popen in execute.py. We use stdout.fileno."""
         self.file   = open(name, mode)
         self.stdout = sys.stdout
         #sys.stdout  = self
