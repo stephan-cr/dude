@@ -124,7 +124,7 @@ Dude provides several other commands to manage expfolders (see TBD).
 Summaries
 ^^^^^^^^^
 
-Dude can collect, filter, aggregate any information from experiments.
+Dude can collect, filter, aggregate any information from experiments with :ref:`summaries`.
 For that the user invokes
 
 .. code-block:: console
@@ -150,7 +150,7 @@ After calling ``dude sum``, the user can access the resulting aggregation file w
   4096 100 buffer_size=4096 timeout=100
 
 
-Dude provides several *summary* objects which can be added directly to the Dudefile as follows::
+Dude provides several :ref:`summary <summaries>` classes which can be added directly to the Dudefile as follows::
 
       import dude.summaries
       summaries = [ dude.summaries.LineSelect('stdout') ]
