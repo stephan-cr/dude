@@ -66,8 +66,11 @@ with open(os.path.join('dude', '__init__.py'), 'r') as version_file:
     pattern.visit(ast.parse(version_file.read()))
     dude_version = pattern.version()
 
+dude_url = 'http://bitbucket.org/db7/dude'
+
 if dude_version is None:
-    sys.stderr.write('cannot determine dude version from source code')
+    sys.stderr.write('cannot determine dude version from source code\n' +
+                     'please report that issue here: ' + dude_url)
     sys.exit(1)
 
 setup(name='dude',
@@ -77,6 +80,6 @@ setup(name='dude',
       packages=['dude'],
       scripts=['scripts/dude'],
       license='MIT License',
-      url='http://bitbucket.org/db7/dude',
+      url=dude_url,
       **extra
       )
