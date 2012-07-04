@@ -200,7 +200,8 @@ def execute_isolated(cfg, optpt, folder, show_output = False):
 
     # call prepare experiment
     if hasattr(cfg, 'prepare_exp'):
-        cfg.prepare_exp(optpt)
+        if cfg.prepare_exp(optpt) == False:
+            return (False, -1 , 0)
 
     status = -1
     try:

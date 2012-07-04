@@ -175,7 +175,7 @@ def main(cargs):
         for f in options.filter.split(','):
             filters.append(cfg.filters[f])
         experiments = filt.filter_experiments(cfg, filters,
-                                              options.invert, True)
+                                              options.invert, False)
     elif options.filter_inline:
         experiments = filt.filter_inline(cfg,
                                          options.filter_inline,
