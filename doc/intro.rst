@@ -162,7 +162,7 @@ From optpts to configuration files
 ----------------------------------
 
 Dude can generate configuration files before executing the command line returned by ``cmdl_exp``.
-For that the user has to provide an ``prepare_exp`` method, which is invoked inside the experiment's folder.
+For that the user has to provide an :ref:`prepare_exp` method, which is invoked inside the experiment's folder.
 Here is an example::
 
   dude_version = 3
@@ -173,7 +173,7 @@ Here is an example::
       'timeout'     : [10, 50, 100]
   }
 
-  def init_exp(optpt):
+  def prepare_exp(optpt):
     f = open("config.txt","w")
     print >>f, "buffer_size=%d timeout=%d" %\
       (optpt['buffer_size'], optpt['timeout'])
