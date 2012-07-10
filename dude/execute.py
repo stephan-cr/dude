@@ -201,6 +201,7 @@ def execute_isolated(cfg, optpt, folder, show_output = False):
     # call prepare experiment
     if hasattr(cfg, 'prepare_exp'):
         if cfg.prepare_exp(optpt) == False:
+            os.chdir(wd)
             return (False, -1 , 0)
 
     status = -1
