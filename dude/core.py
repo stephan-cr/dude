@@ -7,6 +7,7 @@ Core functionality consists of generating points in the options space
 and generating names out of options.
 """
 import os
+import sys
 import utils
 
 ### some constants ####
@@ -28,7 +29,13 @@ def get_experiments(cfg):
             exps = exps_tmp
 
     if hasattr(cfg, 'optpt_cmp'):
-        exps.sort(cmp=cfg.optpt_cmp)
+        if sys.version_info < (3, 2):
+            exps.sort(cmp=cfg.optpt_cmp)
+        else:
+            # starting from Python3.2 the `cmp` parameter is removed
+            # functools.cmp_to_key is introduced since Python2.7 and Python3.2
+            import functools
+            exps.sort(key=functools.cmp_to_key(cfg.optpt_cmp))
 
     return exps
 
