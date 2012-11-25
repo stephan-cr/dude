@@ -39,14 +39,14 @@ def finish_exp(optpt, status):
     pass
 
 import dude.summaries
-sum = dude.summaries.LineSelect (
-        name   = 'example_summary',
-        regex  = '.*',
-        split  = (lambda l: l.split(':')[1]),
-        header = "result"
-        )
+example_summary = dude.summaries.LineSelect (
+    name   = 'example_summary',
+    regex  = '.*',
+    split  = (lambda l: l.split(':')[1]),
+    header = "result"
+    )
 
-summaries = [sum]
+summaries = [example_summary]
 """
 
 
