@@ -1,4 +1,4 @@
-# Copyright (c) 2011 Stephan Creutz
+# Copyright (c) 2011, 2012 Stephan Creutz
 # Distributed under the MIT License
 # See accompanying file LICENSE
 
@@ -6,8 +6,9 @@
 various summary backends
 '''
 
-import os
 import json
+import os
+import re
 import sqlite3
 
 class FileSumBackend:
@@ -81,8 +82,16 @@ class Sqlite3SumBackend:
     def __init__(self, name, dimensions):
         self.__name = name
         self.__connection = sqlite3.connect(name + '.sqlite3')
+        self.__connection.text_factory = str # don't create unicode strings
         self.__cursor = self.__connection.cursor()
         self.__closed = False
+
+    def _create_table(self, table_name, cols):
+        self.__cursor.execute('create table %s (%s);' % \
+                                  (table_name, ', '.join(cols)))
+
+    def _drop_table(self, table_name):
+        self.__cursor.execute('drop table %s;' % table_name)
 
     def write_header(self, header):
         '''
@@ -99,14 +108,25 @@ class Sqlite3SumBackend:
         # check if table already exists
         # SQLite FAQ: http://www.sqlite.org/faq.html#q7
         self.__cursor.execute('''
-select count(name) from sqlite_master where type=\'table\' and name=?;''',
+select name, sql from sqlite_master where type=\'table\' and name=?;''',
                               (table_name,))
 
-        if self.__cursor.fetchone()[0] > 0:
-            self.__cursor.execute('delete from %s;' % table_name)
+        row = self.__cursor.fetchone()
+        if row:
+            sql_statement = row[1]
+            match = re.search(r'\((.*)\)$', sql_statement)
+            prev_cols = match.group(1).split(', ')
+            if set(prev_cols) != set(cols): # number or names of columns changed
+                # there is no choice, the table must be dropped, because "alter"
+                # does not work in all cases
+                self._drop_table(table_name)
+                self._create_table(table_name, cols)
+            else:
+                # all data in the table is deleted because if the transaction
+                # fails, we have at least the previous data
+                self.__cursor.execute('delete from %s;' % table_name)
         else:
-            self.__cursor.execute('create table %s (%s);' % \
-                                      (table_name, ', '.join(cols)))
+            self._create_table(table_name, cols)
 
     def write(self, string):
         '''
