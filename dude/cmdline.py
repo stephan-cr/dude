@@ -26,6 +26,7 @@ import dimensions
 import filter as filt
 import clean
 import info
+import visit
 
 desc = """Commands:
        clean\t\t delete experiments
@@ -36,6 +37,7 @@ desc = """Commands:
        missing\t\t list all missing experiments
        run\t\t run all missing experiments
        sum [<NAME>]\t summarize results (NAME optional)
+       visit-cmd <BASH COMMAND>\t execute BASH COMMAND on each experiment folder
 """
 
 parser = optparse.OptionParser(usage="%prog [OPTIONS] <COMMAND> <ARGS>",
@@ -239,6 +241,15 @@ def main(cargs):
 
         if r == 'y':
             clean.clean_experiments(cfg, experiments)
+    elif cmd == 'visit-cmd':
+        if len(cargs) < 2:
+            print "Specify a bash command after visit-cmd"
+            sys.exit(1)
+        elif len(cargs) > 2:
+            print "Surround multi-term bash commands with \"\"."
+            print "e.g., \"%s\"" % ' '.join(cargs[1:])
+            sys.exit(1)
+        visit.visit_cmd_experiments(cfg, experiments, cargs[1])
     elif cmd == 'info':
         info.show_info(cfg)
     else:
