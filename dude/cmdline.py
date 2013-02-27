@@ -37,7 +37,7 @@ desc = """Commands:
        missing\t\t list all missing experiments
        run\t\t run all missing experiments
        sum [<NAME>]\t summarize results (NAME optional)
-       visit-cmd <BASH COMMAND>\t execute BASH COMMAND on each experiment folder
+       visit-cmd <CMD>\t execute bash CMD on each experiment folder
 """
 
 parser = optparse.OptionParser(usage="%prog [OPTIONS] <COMMAND> <ARGS>",
