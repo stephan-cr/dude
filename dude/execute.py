@@ -200,10 +200,20 @@ def execute_isolated(cfg, optpt, folder, show_output = False):
 
     # call prepare experiment
     if hasattr(cfg, 'prepare_exp'):
-        if cfg.prepare_exp(optpt) == False:
-            os.chdir(wd)
-            return (False, -1 , 0)
-
+        if show_output:
+            f = utils.Tee("dude.prepare_exp", 'w')
+        else:
+            f = open("dude.prepare_exp", 'w')
+        try:
+            stdo, stde = sys.stdout, sys.stderr
+            sys.stdout = sys.stderr = f
+            if cfg.prepare_exp(optpt) == False:
+                os.chdir(wd)
+                return (False, -1 , 0)
+        finally:
+            if f: f.close()
+            sys.stdout = stdo
+            sys.stderr = stde
     status = -1
     try:
         if show_output:
@@ -224,7 +234,18 @@ def execute_isolated(cfg, optpt, folder, show_output = False):
 
         # call prepare experiment
         if hasattr(cfg, 'finish_exp'):
-            cfg.finish_exp(optpt, status)
+            if show_output:
+                f = utils.Tee("dude.finish_exp", 'w')
+            else:
+                f = open("dude.finish_exp", 'w')
+            try:
+                stdo, stde = sys.stdout, sys.stderr
+                sys.stdout = sys.stderr = f
+                cfg.finish_exp(optpt, status)
+            finally:
+                if f: f.close()
+                sys.stdout = stdo
+                sys.stderr = stde
 
         # go back to working dir
         os.chdir(wd)
@@ -253,11 +274,23 @@ def run(cfg, experiments, options):
     elapsed_time = utils.Mean()
 
     if hasattr(cfg, 'prepare_global') and not options.skip_global:
+        if options.show_output:
+            f = utils.Tee("dude.prepare_global", 'w')
+        else:
+            f = open("dude.prepare_global", 'w')
         try:
+            stdo, stde = sys.stdout, sys.stderr
+            sys.stdout = sys.stderr = f
             cfg.prepare_global()
         except KeyboardInterrupt, e:
+            sys.stdout = stdo
+            sys.stderr = stde
             print "Interrupted on prepare_global()"
             sys.exit(1)
+        finally:
+            if f: f.close()
+            sys.stdout = stdo
+            sys.stderr = stde
 
     if not options.global_only:
         # execution loop
@@ -299,11 +332,23 @@ def run(cfg, experiments, options):
     # end not global_only
 
     if hasattr(cfg, 'finish_global') and not options.skip_global:
-        try :
+        if options.show_output:
+            f = utils.Tee("dude.finish_global", 'w')
+        else:
+            f = open("dude.finish_global", 'w')
+        try:
+            stdo, stde = sys.stdout, sys.stderr
+            sys.stdout = sys.stderr = f
             cfg.finish_global()
-        except KeyboardInterrupt, e :
-            print "Interrupted on finish_global()"
+        except KeyboardInterrupt, e:
+            sys.stdout = stdo
+            sys.stderr = stde
+            print "Interrupted on prepare_global()"
             sys.exit(1)
+        finally:
+            if f: f.close()
+            sys.stdout = stdo
+            sys.stderr = stde
 
 def check_cfg(cfg):
     assert hasattr(cfg, 'options')
