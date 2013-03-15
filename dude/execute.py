@@ -1,4 +1,4 @@
-# Copyright (c) 2010 Diogo Becker
+# Copyright (c) 2010, 2013 Diogo Becker
 # Distributed under the MIT License
 # See accompanying file LICENSE
 
@@ -131,7 +131,8 @@ class ForkProcess:
             os._exit(ret)
 
 def kill_proc(cfg, proc, terminate):
-    """Stops the experiment and asks if it should stop the complete set of experiments or not"""
+    """Stops the experiment and asks if it should stop the complete
+    set of experiments or not"""
     proc.kill()
     if hasattr(cfg, 'on_kill'):
         cfg.on_kill(None)
@@ -140,7 +141,8 @@ def kill_proc(cfg, proc, terminate):
         os._exit(1)
 
 def execute_one(cfg, optpt, stdout, stderr):
-    """Run experiment in a child process. Kill process on timeout or keyboard interruption."""
+    """Run experiment in a child process. Kill process on timeout or
+    keyboard interruption."""
 
     timeout = cfg.timeout
 
@@ -157,7 +159,8 @@ def execute_one(cfg, optpt, stdout, stderr):
 
     try:
         # overwrite sigint handler
-        signal.signal(signal.SIGINT, lambda num, frame: kill_proc(cfg, proc, True))
+        signal.signal(signal.SIGINT,
+                      lambda num, frame: kill_proc(cfg, proc, True))
 
         # start process
         proc.start()
