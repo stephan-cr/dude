@@ -117,9 +117,15 @@ class ForkProcess:
             print '~'*60
             traceback.print_exc(file=sys.stdout)
             print '#'*60
+            sys.stdout.flush()
+            sys.stderr.flush()
             os._exit(2)
         finally:
+            sys.stdout.flush()
+            sys.stderr.flush()
             sys.stdout, sys.stderr = so, se
+            sys.stdout.flush()
+            sys.stderr.flush()
             if ret == None:
                 ret = 0
             os._exit(ret)
