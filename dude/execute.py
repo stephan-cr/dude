@@ -282,6 +282,10 @@ def execute_isolated(cfg, optpt, folder, show_output = False):
                 if f: f.close()
                 sys.stdout = stdo
                 sys.stderr = stde
+
+            # unlock experiment
+            core.experiment_unlock(cfg, ".")
+
         else:
             # unlock experiment
             core.experiment_unlock(cfg, ".")
@@ -301,7 +305,7 @@ def run(cfg, experiments, options):
     """
 
     # print information
-    info.show_info(cfg)
+    info.show_info(cfg, experiments)
 
     # initialize counters
     t_start = tc()

@@ -251,7 +251,9 @@ def main(cargs):
             sys.exit(1)
         visit.visit_cmd_experiments(cfg, experiments, cargs[1])
     elif cmd == 'info':
-        info.show_info(cfg)
+        info.show_info(cfg, experiments)
+    elif cmd == 'status':
+        info.print_status(cfg, experiments)
     else:
         print >> sys.stderr, "ERROR: wrong command. %s" % cargs[0]
         parser.print_help()

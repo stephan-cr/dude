@@ -7,6 +7,7 @@ Dude output for experiments
 """
 import utils
 import os
+import core
 
 HEAD = '~'*80
 HEAD2 = '~'*80
@@ -40,7 +41,7 @@ class PBar:
         return "".join(out)
 
 
-def show_info(cfg):
+def show_info(cfg, experiments):
     name = cfg.name if hasattr(cfg, 'name') else os.getcwd()
     print HEAD2
     print 'Experiment set:', name
@@ -118,3 +119,25 @@ def print_elapsed(timeout, elapsed, last_elapsed = None):
         b.fill(p)
         print b, "\telapsed: %d" % (int(elapsed)), "seconds", " " + chr(27) + '[A'
 
+def print_status(cfg, experiments):
+    name = cfg.name if hasattr(cfg, 'name') else os.getcwd()
+    print HEAD2
+    print 'Experiment set:', name
+    print LINE
+    total_runs = len(experiments)
+    #missing_runs = total_runs - core.success_count(cfg, experiments)
+    success  = core.success_count(cfg, experiments)
+    failed   = len(core.get_failed(cfg, False))
+    missing  = len(core.get_failed(cfg, True))
+    print 'Statistics:'
+    print '  Total    : %d' % (total_runs)
+    print '  Finished : %d' % (success + failed)
+    print '  Pending  : %d' % (missing - failed)
+    print '  Failed   : %d' % (failed)
+    print 'Running:'
+    for e in experiments:
+        v = core.experiment_running(cfg, e)
+        if v:
+            print '%10d : %s' % (v, core.get_folder(cfg, e))
+    print HEAD2
+    print
