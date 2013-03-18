@@ -9,17 +9,9 @@ import random
 import sys
 import time
 
-if __name__ == '__main__':
-    if len(sys.argv) != 4:
-        print "Wrong number of arguments"
-        sys.exit(0)
-
-    # read operation
-    a = sys.argv[1]
-    # read first argument with error
-    b = float(sys.argv[2]) + random.uniform(0.00001, 0.0001)
-    # read second argument with error
-    c = float(sys.argv[3]) + random.uniform(0.00001, 0.0001)
+def foo(a, b, c):
+    b = float(b) + random.uniform(0.00001, 0.0001)
+    c = float(c) + random.uniform(0.00001, 0.0001)
 
     # perform operation if valid
     if a == 'times':
@@ -33,7 +25,14 @@ if __name__ == '__main__':
         res = b-c
     else:
         print "Argument 1 not supported"
+        sys.exit(-1)
+
+    return res
+
+if __name__ == '__main__':
+    if len(sys.argv) != 4:
+        print "Wrong number of arguments"
         sys.exit(0)
 
     # print result
-    print ':> ', res
+    print ':> ', foo(sys.argv[1], sys.argv[2], sys.argv[3])

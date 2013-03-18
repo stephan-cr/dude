@@ -1,0 +1,146 @@
+# -*- mode: python -*-
+#
+# test -- test
+# ************
+
+#
+#
+import dude.summaries
+from dude.defaults import *
+dude_version = 3
+
+import sys
+sys.path.append(root + '/../simple/bin')
+import example
+import time
+
+# example of experiment set
+
+name = "simple example"
+timeout = 3
+
+# options and constraints
+# =======================
+#
+# the program to be used is bin/example.py
+# it takes 3 parameters: operation operand operand
+
+optspace = {
+    'operation' : ['times', 'div', 'plus', 'minus'],
+    'left'      : range(0, 2),
+    'right'     : range(0, 1),
+    'runs'      : range(3)
+}
+
+# order experiments according to the following comparison function (optional)
+
+def optpt_cmp(optpt1, optpt2):
+    return cmp(optpt1, optpt2)
+
+# the experiments are the cartesian product of the options.
+# we can define constraints to remove undesired experiments from the set,
+# for example, we don't want to divide by zero.
+
+def non_zero_div(optpt):
+    operation = optpt['operation']
+    right = optpt['right']
+    return not (operation == 'div' and right == 0)
+
+# all constraints should be put in the following list
+
+constraints = [ non_zero_div ]
+
+# but the variable can also be set to [] if there are no constraints.
+
+
+# executing the experiments
+# =========================
+
+# the results of the executions will be placed in the following directory
+
+raw_output_dir = "raw"
+
+# if nothing should be done, only define the function as above.
+# note that the current working directory when prepare exp is called is not the
+# directory where dude is called. if you want to access that directory use the
+# predefined variable root (see the following example)
+
+# cmdl_exp returns a string that is the command to be executed. It can contain
+# environment variables and parameters as any command line.
+# note that the working directory is some subdirectory of "raw_output_dir".
+# to access the example.py I use the root variable here, which points to the
+# directory where the script was called.
+
+def fork_exp(optpt):
+    time.sleep(5)
+    print example.foo(str(optpt['operation']),
+                      str(optpt['left']),
+                      str(optpt['right']))
+
+# additional methods
+# ------------------
+#
+
+# before starting each experiment, we have the opportunity to add files or run
+# other commands by defining the following function.
+
+def prepare_exp(optpt):
+    pass
+
+# before any experiment
+
+def prepare_global():
+    pass
+
+# after executing the command
+
+def finish_exp(optpt, status):
+    pass
+
+
+# summaries
+# =========
+#
+# the above configuration is enough to run all the experiments. now we have
+# additional configurations to summarize the raw data.
+
+# "output" is the directory where the summarized/parsed/etc data will be saved
+
+sum_output_dir = "output"
+
+# we can create any number of summaries.
+
+simple = dude.summaries.LineSelect (
+    name   = 'summary',
+    groupby = ['operation'],
+    header = 'result',
+    regex  = '[0-9].*',
+    split  = (lambda line: float(line))
+    )
+
+# dimensions are referent to options.
+# groupby will split the data in groups using the keys given in the list.
+# in this example we split the data by operations (minus, plus, etc)
+# setting headers
+# we must define a process function, which takes the "point" in the dimensions,
+# the output (stdout) file stream of the experiment, and a summary writable file
+# stream where the summary data should be written. In this example I print
+# multiple lines with columns being: left right result
+# summaries should be a list. can be empty
+summaries = [simple]
+
+# filters
+# =======
+#
+
+def only_times_and_greater_than(point, run, stdout):
+    if point['operation'] == 'times':
+        for l in stdout.readlines():
+            if len(l) > 1:
+                n = float(l.split(':>')[1][:-1])
+                if n > 0.00005 :
+                    return True
+    return False
+
+filters = {}
+filters['great'] = only_times_and_greater_than
