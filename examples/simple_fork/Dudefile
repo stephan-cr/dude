@@ -72,7 +72,7 @@ raw_output_dir = "raw"
 # directory where the script was called.
 
 def fork_exp(optpt):
-    time.sleep(5)
+    time.sleep(2)
     print example.foo(str(optpt['operation']),
                       str(optpt['left']),
                       str(optpt['right']))

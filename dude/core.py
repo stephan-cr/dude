@@ -8,12 +8,14 @@ and generating names out of options.
 """
 import os
 import sys
+import fcntl
 import utils
 
 ### some constants ####
 SEP = '__'
 statusFile = 'dude.status'
 outputFile = 'dude.output'
+lockFile   = 'dude.lock'
 
 
 def get_experiments(cfg):
@@ -162,6 +164,47 @@ def success_count(cfg, experiments):
         if experiment_success(cfg, experiment):
             c += 1
     return c
+
+def experiment_running(cfg, experiment):
+    """ Return None if not running, otherwise return pid of process
+    running experiment."""
+    folder = get_folder(cfg, experiment)
+    lFile  = os.path.join(folder, lockFile)
+
+    if os.path.exists(lFile):
+        f = open(lFile, "r")
+        pid = int(f.readline())
+        return pid
+    else:
+        return None
+
+def experiment_lock(cfg, folder):
+    """Lock an experiment folder"""
+    lFile  = os.path.join(folder, lockFile)
+
+    if os.path.exists(lFile):
+        return False
+    else:
+        f = open(lFile, 'w')
+        try:
+            fcntl.flock(f, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            f.write("%d\n" % os.getpid())
+        except IOError:
+            return False
+        finally:
+            ## should we close the file or keep a pointer to the fd in
+            ## a global variable?
+            f.close()
+
+        return True
+
+def experiment_unlock(cfg, folder):
+    """Lock an experiment folder"""
+    lFile  = os.path.join(folder, lockFile)
+
+    assert os.path.exists(lFile)
+    if os.path.exists(lFile):
+        os.remove(lFile)
 
 def check_cfg(cfg):
     """

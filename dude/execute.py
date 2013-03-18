@@ -139,6 +139,11 @@ def kill_proc(cfg, proc, terminate):
     set of experiments or not"""
     #print "Hey hoo", os.getpid()
     proc.kill()
+
+    # unlock experiment (we are in the experiment directory since we
+    # called chdir).
+    core.experiment_unlock(cfg, ".")
+
     if hasattr(cfg, 'on_kill'):
         cfg.on_kill(None)
     # time.sleep(3)
@@ -208,6 +213,10 @@ def execute_isolated(cfg, optpt, folder, show_output = False):
     """Executes one experiment in a separate folder"""
     start = tc()
 
+    # lock experiment
+    if not core.experiment_lock(cfg, folder):
+        return (False, 0, 0)
+
     # skip successful runs
     if core.exist_status_file(folder):
         val = core.read_status_file(folder)
@@ -229,6 +238,9 @@ def execute_isolated(cfg, optpt, folder, show_output = False):
             stdo, stde = sys.stdout, sys.stderr
             sys.stdout = sys.stderr = f
             if cfg.prepare_exp(optpt) == False:
+                # unlock experiment
+                core.experiment_unlock(cfg, ".")
+
                 os.chdir(wd)
                 return (False, -1 , 0)
         finally:
@@ -263,10 +275,16 @@ def execute_isolated(cfg, optpt, folder, show_output = False):
                 stdo, stde = sys.stdout, sys.stderr
                 sys.stdout = sys.stderr = f
                 cfg.finish_exp(optpt, status)
+            except:
+                # unlock experiment
+                core.experiment_unlock(cfg, ".")
             finally:
                 if f: f.close()
                 sys.stdout = stdo
                 sys.stderr = stde
+        else:
+            # unlock experiment
+            core.experiment_unlock(cfg, ".")
 
         # go back to working dir
         os.chdir(wd)
