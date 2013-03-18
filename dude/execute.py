@@ -13,6 +13,7 @@ import subprocess
 import sys
 import time
 import utils
+import errno
 from threading import Timer
 
 tc = time.time
@@ -106,10 +107,13 @@ class ForkProcess:
         sys.stderr = self.stderr
 
         ret = 1
-        print "dude: child start"
+        print "dude: child start", os.getpid()
         try:
             ret = self.func(self.optpt)
             print "dude: child exit", ret
+        except KeyboardInterrupt, e:
+            #print "Cought keyboard interrupt in child"
+            os._exit(1)
         except Exception, e:
             print "Exception in fork_cmd:"
             print '#'*60
@@ -133,6 +137,7 @@ class ForkProcess:
 def kill_proc(cfg, proc, terminate):
     """Stops the experiment and asks if it should stop the complete
     set of experiments or not"""
+    #print "Hey hoo", os.getpid()
     proc.kill()
     if hasattr(cfg, 'on_kill'):
         cfg.on_kill(None)
@@ -158,12 +163,19 @@ def execute_one(cfg, optpt, stdout, stderr):
     old_handler = signal.getsignal(signal.SIGINT)
 
     try:
-        # overwrite sigint handler
-        signal.signal(signal.SIGINT,
-                      lambda num, frame: kill_proc(cfg, proc, True))
+        try:
+            # start process
+            proc.start()
 
-        # start process
-        proc.start()
+            # overwrite sigint handler. If a KeyboardInterrupt occurs
+            # before that, we catch that bellow and kill the process
+            # manually.
+            signal.signal(signal.SIGINT,
+                          lambda num, frame: kill_proc(cfg, proc, True))
+        except KeyboardInterrupt, e:
+            #print "Cought keyboard interrupt"
+            kill_proc(cfg, proc, True) # True == terminate dude
+            assert False, "Never reach this line"
 
         # start timer after starting process. That is important
         # otherwise a forked process gets the timer as well.
