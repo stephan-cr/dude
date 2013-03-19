@@ -276,15 +276,14 @@ def execute_isolated(cfg, optpt, folder, show_output = False):
                 sys.stdout = sys.stderr = f
                 cfg.finish_exp(optpt, status)
             except:
-                # unlock experiment
-                core.experiment_unlock(cfg, ".")
+                pass
             finally:
                 if f: f.close()
                 sys.stdout = stdo
                 sys.stderr = stde
 
-            # unlock experiment
-            core.experiment_unlock(cfg, ".")
+                # unlock experiment
+                core.experiment_unlock(cfg, ".")
 
         else:
             # unlock experiment
