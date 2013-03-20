@@ -37,6 +37,7 @@ desc = """Commands:
        missing\t\t list all missing experiments
        run\t\t run all missing experiments
        sum [<NAME>]\t summarize results (NAME optional)
+       status\t\t show experiments status and running experiment
        visit-cmd <CMD>\t execute bash CMD on each experiment folder
 """
 
