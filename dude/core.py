@@ -172,8 +172,14 @@ def experiment_running(cfg, experiment):
     lFile  = os.path.join(folder, lockFile)
 
     if os.path.exists(lFile):
-        f = open(lFile, "r")
-        pid = int(f.readline())
+        try:
+            f = open(lFile, "r")
+            pid = int(f.readline())
+        except TypeError:
+            print "Error reading lock file %s" % lFile
+            sys.exit(1)
+        finally:
+            f.close()
         return pid
     else:
         return None
@@ -192,19 +198,16 @@ def experiment_lock(cfg, folder):
         except IOError:
             return False
         finally:
-            ## should we close the file or keep a pointer to the fd in
-            ## a global variable?
             f.close()
 
         return True
 
 def experiment_unlock(cfg, folder):
-    """Lock an experiment folder"""
+    """Unlock an experiment folder"""
     lFile  = os.path.join(folder, lockFile)
 
-    assert os.path.exists(lFile)
-    if os.path.exists(lFile):
-        os.remove(lFile)
+    assert os.path.exists(lFile), "Lock file was removed by another process"
+    os.remove(lFile)
 
 def check_cfg(cfg):
     """

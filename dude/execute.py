@@ -137,7 +137,6 @@ class ForkProcess:
 def kill_proc(cfg, proc, terminate):
     """Stops the experiment and asks if it should stop the complete
     set of experiments or not"""
-    #print "Hey hoo", os.getpid()
     proc.kill()
 
     # unlock experiment (we are in the experiment directory since we
