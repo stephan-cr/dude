@@ -221,6 +221,10 @@ def execute_isolated(cfg, optpt, folder, show_output = False):
         val = core.read_status_file(folder)
         if val == 0:
             # it ran successfully, don't repeat exp
+
+            # unlock experiment
+            core.experiment_unlock(cfg, ".")
+
             return (False, val, 0)
 
     # change working directory
@@ -281,12 +285,8 @@ def execute_isolated(cfg, optpt, folder, show_output = False):
                 sys.stdout = stdo
                 sys.stderr = stde
 
-                # unlock experiment
-                core.experiment_unlock(cfg, ".")
-
-        else:
-            # unlock experiment
-            core.experiment_unlock(cfg, ".")
+        # unlock experiment
+        core.experiment_unlock(cfg, ".")
 
         # go back to working dir
         os.chdir(wd)
