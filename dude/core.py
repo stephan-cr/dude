@@ -90,9 +90,11 @@ def experiment_success(cfg, experiment):
     outputFolder = get_folder(cfg, experiment)
     oFile   = os.path.join(outputFolder, outputFile)
     sFile   = os.path.join(outputFolder, statusFile)
+    lFile   = os.path.join(outputFolder, lockFile)
 
-    if not os.path.exists(oFile) or not os.path.exists(sFile):
-        # it didn't run yet, return None
+    if not os.path.exists(oFile) or not os.path.exists(sFile) \
+            or os.path.exists(lFile):
+        # it didn't run yet (or it is running), return None
         return False
     f = open(sFile, 'r')
     try:
@@ -112,8 +114,10 @@ def experiment_ran(cfg, experiment):
     outputFolder = get_folder(cfg, experiment)
     oFile   = os.path.join(outputFolder, outputFile)
     sFile   = os.path.join(outputFolder, statusFile)
+    lFile   = os.path.join(outputFolder, lockFile)
 
-    if not os.path.exists(oFile) or not os.path.exists(sFile):
+    if os.path.exists(lFile) or not os.path.exists(oFile) \
+            or not os.path.exists(sFile):
         return False
     else:
         return True
@@ -127,8 +131,9 @@ def get_failed(cfg, missing = False):
         outputFolder = get_folder(cfg, exp)
         oFile   = os.path.join(outputFolder, outputFile)
         sFile   = os.path.join(outputFolder, statusFile)
+        lFile   = os.path.join(outputFolder, lockFile)
 
-        if not os.path.exists(sFile):
+        if os.path.exists(lFile) or not os.path.exists(sFile):
             if missing:
                 failed.append(exp)
                 continue

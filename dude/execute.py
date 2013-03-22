@@ -139,15 +139,18 @@ def kill_proc(cfg, proc, terminate):
     set of experiments or not"""
     proc.kill()
 
-    # unlock experiment (we are in the experiment directory since we
-    # called chdir).
-    core.experiment_unlock(cfg, ".")
-
     if hasattr(cfg, 'on_kill'):
         cfg.on_kill(None)
-    # time.sleep(3)
+
     if terminate:
+        # Unlock experiment (we are in the experiment directory since
+        # we called chdir).
+        core.experiment_unlock(cfg, ".")
         os._exit(1)
+    else:
+        # If it was a timeout, terminate is false. The unlock is
+        # called in the finally of execute_one().
+        pass
 
 def execute_one(cfg, optpt, stdout, stderr):
     """Run experiment in a child process. Kill process on timeout or
