@@ -223,7 +223,7 @@ def execute_isolated(cfg, optpt, folder, show_output = False):
             # it ran successfully, don't repeat exp
 
             # unlock experiment
-            core.experiment_unlock(cfg, ".")
+            core.experiment_unlock(cfg, folder)
 
             return (False, val, 0)
 
