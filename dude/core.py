@@ -17,6 +17,8 @@ statusFile = 'dude.status'
 outputFile = 'dude.output'
 lockFile   = 'dude.lock'
 
+### module global variables ###
+lockFileHandle = None
 
 def get_experiments(cfg):
     """Creates a list of experiments."""
@@ -176,42 +178,50 @@ def experiment_running(cfg, experiment):
     folder = get_folder(cfg, experiment)
     lFile  = os.path.join(folder, lockFile)
 
-    if os.path.exists(lFile):
-        try:
-            f = open(lFile, "r")
-            pid = int(f.readline())
-        except TypeError:
-            print "Error reading lock file %s" % lFile
-            sys.exit(1)
-        finally:
+    f = None
+    try:
+        f = open(lFile, 'r')
+        pid = int(f.readline())
+    except IOError:
+        return None # file does not exist, experiment not running
+    except ValueError:
+        return -1 # no pid known yet, retry later
+    finally:
+        if f is not None:
             f.close()
-        return pid
-    else:
-        return None
+
+    return pid
 
 def experiment_lock(cfg, folder):
     """Lock an experiment folder"""
+    global lockFileHandle
     lFile  = os.path.join(folder, lockFile)
 
     if os.path.exists(lFile):
         return False
     else:
-        f = open(lFile, 'w')
+        lockFileHandle = open(lFile, 'a')
         try:
-            fcntl.flock(f, fcntl.LOCK_EX | fcntl.LOCK_NB)
-            f.write("%d\n" % os.getpid())
-        except IOError:
-            return False
-        finally:
-            f.close()
+            fcntl.flock(lockFileHandle, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            lockFileHandle.write("%d\n" % os.getpid())
+            lockFileHandle.flush()
+        except IOError as e:
+            if e.args[0] == 11: # Resource temporarily unavailable
+                lockFileHandle.close()
+                return False
+            else:
+                raise
 
         return True
 
 def experiment_unlock(cfg, folder):
     """Unlock an experiment folder"""
+    global lockFileHandle
     lFile  = os.path.join(folder, lockFile)
 
     assert os.path.exists(lFile), "Lock file was removed by another process"
+
+    lockFileHandle.close()
     os.remove(lFile)
 
 def check_cfg(cfg):
