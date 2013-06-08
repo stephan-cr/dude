@@ -125,10 +125,9 @@ def experiment_ran(cfg, experiment):
         return True
 
 
-def get_failed(cfg, missing = False):
+def get_failed(cfg, experiments, missing = False):
     """Get the list of output files of executions that failed """
     failed = []
-    experiments = get_experiments(cfg)
     for exp in experiments:
         outputFolder = get_folder(cfg, exp)
         oFile   = os.path.join(outputFolder, outputFile)

@@ -127,8 +127,8 @@ def print_status(cfg, experiments):
     total_runs = len(experiments)
     #missing_runs = total_runs - core.success_count(cfg, experiments)
     success  = core.success_count(cfg, experiments)
-    failed   = len(core.get_failed(cfg, False))
-    missing  = len(core.get_failed(cfg, True))
+    failed   = len(core.get_failed(cfg, experiments, False))
+    missing  = len(core.get_failed(cfg, experiments, True))
     print 'Statistics:'
     print '  Total    : %d' % (total_runs)
     print '  Finished : %d' % (success + failed)

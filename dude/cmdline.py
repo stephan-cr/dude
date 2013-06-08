@@ -141,7 +141,7 @@ def main(cargs):
                     break
                 except IOError:
                     pass
-            if cfg != None: 
+            if cfg != None:
                 break
             else:
                 i += 1
@@ -223,11 +223,11 @@ def main(cargs):
             else:
                 print core.get_folder(cfg, experiment)
     elif cmd == 'failed':
-        failed = core.get_failed(cfg, False)
+        failed = core.get_failed(cfg, experiments, False)
         for ffile in failed:
             print ffile
     elif cmd == 'missing':
-        failed = core.get_failed(cfg, True)
+        failed = core.get_failed(cfg, experiments, True)
         for exp in failed:
             print exp
     elif cmd == 'clean':
