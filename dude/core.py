@@ -136,11 +136,8 @@ def get_failed(cfg, experiments, missing = False):
 
         if os.path.exists(lFile) or not os.path.exists(sFile):
             if missing:
-                failed.append(exp)
-                continue
-            else:
-                # not run
-                continue
+                failed.append(outputFolder)
+            continue
 
         f = open(sFile, 'r')
         try:
@@ -153,7 +150,7 @@ def get_failed(cfg, experiments, missing = False):
             if not missing:
                 failed.append(oFile)
             else:
-                failed.append(exp)
+                failed.append(outputFolder)
     return failed
 
 # def success_count(cfg, experiments):
