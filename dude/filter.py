@@ -29,13 +29,21 @@ def filter_one(cfg, experiments, filter, invert, only_ran):
             os.chdir(wd)
         elif not only_ran:
             folder = core.get_folder(cfg, experiment)
-            os.chdir(folder)
-            ret = filter(experiment, None)
-            if not invert and ret:
-                filtered_experiments.append( experiment )
-            if invert and not ret:
-                filtered_experiments.append( experiment )
-            os.chdir(wd)
+            if os.path.exists(folder):
+                os.chdir(folder)
+                ret = filter(experiment, None)
+                if not invert and ret:
+                    filtered_experiments.append( experiment )
+                if invert and not ret:
+                    filtered_experiments.append( experiment )
+                os.chdir(wd)
+            else:
+                ret = filter(experiment, None)
+                if not invert and ret:
+                    filtered_experiments.append( experiment )
+                if invert and not ret:
+                    filtered_experiments.append( experiment )
+
     return filtered_experiments
 
 
