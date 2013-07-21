@@ -8,6 +8,7 @@ Dude output for experiments
 import utils
 import os
 import core
+import sys
 
 HEAD = '~'*80
 HEAD2 = '~'*80
@@ -107,7 +108,10 @@ def print_exp_simple(actual_runs, total_runs, missing_runs):
 
 def print_elapsed(timeout, elapsed, last_elapsed = None):
     if timeout == None:
-        timeout = 10000
+        # mock the limit just to show some progress
+        timeout = 60
+        if elapsed > timeout:
+            timeout = elapsed * 1.5 
     b = PBar(20)
     p = elapsed * 1000 / timeout * 100
     p /= 1000
@@ -118,6 +122,7 @@ def print_elapsed(timeout, elapsed, last_elapsed = None):
     else:
         b.fill(p)
         print b, "\telapsed: %d" % (int(elapsed)), "seconds", " " + chr(27) + '[A'
+    sys.stdout.flush()
 
 def print_status(cfg, experiments):
     name = cfg.name if hasattr(cfg, 'name') else os.getcwd()

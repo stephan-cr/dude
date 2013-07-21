@@ -199,8 +199,9 @@ def execute_one(cfg, optpt, stdout, stderr):
 
             time.sleep(0.01 if elapsed < 5 else 5.0)
             elapsed = time.time() - start_time
-            if elapsed >= 5 and timeout is not None and elapsed < timeout:
-                info.print_elapsed(timeout, elapsed)
+            if elapsed >= 5:
+                if timeout is None or elapsed < timeout: 
+                    info.print_elapsed(timeout, elapsed)
     finally:
         # restore sigint handleer
         signal.signal(signal.SIGINT, old_handler)
