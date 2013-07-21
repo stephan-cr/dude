@@ -102,7 +102,6 @@ class ForkProcess:
             assert False
 
     def __child(self):
-        so, se = sys.stdout, sys.stderr
         sys.stdout = self.stdout
         sys.stderr = self.stderr
 
@@ -127,7 +126,7 @@ class ForkProcess:
         finally:
             sys.stdout.flush()
             sys.stderr.flush()
-            sys.stdout, sys.stderr = so, se
+            sys.stdout, sys.stderr = sys.__stdout__, sys.__stderr__
             sys.stdout.flush()
             sys.stderr.flush()
             if ret == None:
@@ -241,7 +240,6 @@ def execute_isolated(cfg, optpt, folder, show_output = False):
         else:
             f = open("dude.prepare_exp", 'w')
         try:
-            stdo, stde = sys.stdout, sys.stderr
             sys.stdout = sys.stderr = f
             if cfg.prepare_exp(optpt) == False:
                 # unlock experiment
@@ -251,8 +249,8 @@ def execute_isolated(cfg, optpt, folder, show_output = False):
                 return (False, -1 , 0)
         finally:
             if f: f.close()
-            sys.stdout = stdo
-            sys.stderr = stde
+            sys.stdout = sys.__stdout__
+            sys.stderr = sys.__stderr__
     status = -1
     try:
         if show_output:
@@ -278,15 +276,14 @@ def execute_isolated(cfg, optpt, folder, show_output = False):
             else:
                 f = open("dude.finish_exp", 'w')
             try:
-                stdo, stde = sys.stdout, sys.stderr
                 sys.stdout = sys.stderr = f
                 cfg.finish_exp(optpt, status)
             except:
                 pass
             finally:
                 if f: f.close()
-                sys.stdout = stdo
-                sys.stderr = stde
+                sys.stdout = sys.__stdout__
+                sys.stderr = sys.__stderr__
 
         # unlock experiment
         core.experiment_unlock(cfg, ".")
@@ -323,18 +320,17 @@ def run(cfg, experiments, options):
         else:
             f = open("dude.prepare_global", 'w')
         try:
-            stdo, stde = sys.stdout, sys.stderr
             sys.stdout = sys.stderr = f
             cfg.prepare_global()
         except KeyboardInterrupt, e:
-            sys.stdout = stdo
-            sys.stderr = stde
+            sys.stdout = sys.__stdout__
+            sys.stderr = sys.__stderr__
             print "Interrupted on prepare_global()"
             sys.exit(1)
         finally:
             if f: f.close()
-            sys.stdout = stdo
-            sys.stderr = stde
+            sys.stdout = sys.__stdout__
+            sys.stderr = sys.__stderr__
 
     if not options.global_only:
         # execution loop
@@ -381,18 +377,17 @@ def run(cfg, experiments, options):
         else:
             f = open("dude.finish_global", 'w')
         try:
-            stdo, stde = sys.stdout, sys.stderr
             sys.stdout = sys.stderr = f
             cfg.finish_global()
         except KeyboardInterrupt, e:
-            sys.stdout = stdo
-            sys.stderr = stde
+            sys.stdout = sys.__stdout__
+            sys.stderr = sys.__stderr__
             print "Interrupted on prepare_global()"
             sys.exit(1)
         finally:
             if f: f.close()
-            sys.stdout = stdo
-            sys.stderr = stde
+            sys.stdout = sys.__stdout__
+            sys.stderr = sys.__stderr__
 
 def check_cfg(cfg):
     assert hasattr(cfg, 'options')
