@@ -64,15 +64,15 @@ def get_name(prefix, optpt):
         s += ''.join(os.path.split(st))
     return s
 
-def get_folder(cfg, experiment, check = True):
+def get_folder(cfg, experiment, check = False):
     """Returns the experiment folder. Creates it if necessary."""
     folder = get_raw_folder(cfg)
-    if check:
-        utils.checkFolder(folder)
+    utils.checkFolder(folder)
 
     # add experiment subfolder
     folder = os.path.join(folder, get_name('exp', experiment))
-    utils.checkFolder(folder)
+    if check:
+        utils.checkFolder(folder)
     return folder
 
 def exist_status_file(folder):

@@ -11,7 +11,8 @@ def clean_experiments(cfg, experiments):
     for experiment in experiments:
         folder = core.get_folder(cfg, experiment)
         print "Cleaning", folder
-        shutil.rmtree(folder)
+        if os.path.exists(folder):
+            shutil.rmtree(folder)
 
 def clean_experiment(folder):
     status_file = os.path.join(folder, 'dude.status')

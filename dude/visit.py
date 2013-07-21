@@ -17,6 +17,7 @@ def visit_cmd_experiment(folder, cmd):
 
 def visit_cmd_experiments(cfg, experiments, cmd):
     for experiment in experiments:
-        folder = core.get_folder(cfg, experiment, cmd)
-        print "Executing \"%s\" in %s" % (cmd, folder)
-        visit_cmd_experiment(folder, cmd)
+        folder = core.get_folder(cfg, experiment)
+        if os.path.exists(folder):
+            print "Executing \"%s\" in %s" % (cmd, folder)
+            visit_cmd_experiment(folder, cmd)

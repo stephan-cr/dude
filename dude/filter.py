@@ -83,7 +83,7 @@ def filter_inline(cfg, filters, invert, only_ran=True):
 
 def filter_path(cfg, path):
     def foo(optpt, outf):
-        if core.get_folder(cfg, optpt, check = False) == path:
+        if core.get_folder(cfg, optpt) == path:
             return True
         else:
             return False

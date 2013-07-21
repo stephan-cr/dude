@@ -340,7 +340,7 @@ def run(cfg, experiments, options):
             actual_runs += 1
 
             # get dir name and create if necessary
-            folder = core.get_folder(cfg, experiment)
+            folder = core.get_folder(cfg, experiment, True)
 
             # show experiment info
             info.show_exp_info(cfg, experiment, folder,
