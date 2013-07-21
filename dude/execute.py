@@ -112,7 +112,7 @@ class ForkProcess:
             print "dude: child exit", ret
         except KeyboardInterrupt, e:
             #print "Cought keyboard interrupt in child"
-            os._exit(1)
+            os._exit(3) ## keyinterrupt or timeout
         except Exception, e:
             print "Exception in fork_cmd:"
             print '#'*60
