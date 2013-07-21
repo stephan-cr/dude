@@ -8,6 +8,7 @@ import core
 import os
 import utils
 import re
+import sys
 
 def filter_one(cfg, experiments, filter, invert, only_ran):
     """ """
@@ -71,9 +72,11 @@ def filter_inline(cfg, filters, invert, only_ran=True):
             value = [utils.parse_value(value)]
         flts.append((key,value))
 
-        # add optpt to optspace if it does not exist
+        # if dimension not in optspace exit
         if key not in cfg.optspace:
-            cfg.optspace[key] = []
+            print key, "does not belong to optspace"
+            print "dimensions:", ','.join(cfg.optspace.keys())
+            sys.exit(1)
 
         for v in value:
             if v not in cfg.optspace[key]:
