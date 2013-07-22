@@ -35,6 +35,8 @@ For example, our program is ``echo`` and simply print on the screen the buffer s
     def cmdl_exp(optpt):
     	return "echo buffer_size=%d" % optpt['buffer_size']
 
+Alternatively, you can define ``fork_exp(optpt)`` *instead* of ``cmdl_exp(optpt)``. If ``fork_exp`` is defined, Dude will fork its execution and considered the forked process as the experiment. See :ref:`spawn_or_fork` section for the alternatives, and see :ref:`remote_experiments` for information on how to start experiments in remotely.
+
 When Dude is invoked, it generates all optpts of an optspace by calculating its cartesian product.
 It then creates for each experiment a folder, and spawns the command line inside this folder.
 A minimal Dudefile follows::
@@ -120,6 +122,8 @@ For checking which experiments failed, one can simply type:
 In this example, the experiment with optpt ``{ 'buffer_size' : 1024, 'timeout' : 100 }`` returned with a value different than 0 (it failed).
 When invoking ``dude run`` again, only failed (or not yet run) experiments are executed.
 Dude provides several other commands to manage expfolders (see TBD).
+
+.. hint:: See :ref:`optptcmp` to learn how to specify the execution order of the experiments.
 
 Summaries
 ^^^^^^^^^
