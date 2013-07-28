@@ -35,7 +35,7 @@ For example, our program is ``echo`` and simply print on the screen the buffer s
     def cmdl_exp(optpt):
     	return "echo buffer_size=%d" % optpt['buffer_size']
 
-Alternatively, you can define ``fork_exp(optpt)`` *instead* of ``cmdl_exp(optpt)``. If ``fork_exp`` is defined, Dude will fork its execution and considered the forked process as the experiment. See :ref:`spawn_or_fork` section for the alternatives, and see :ref:`remote_experiments` for information on how to start experiments in remotely.
+Alternatively, you can define ``fork_exp(optpt)`` *instead* of ``cmdl_exp(optpt)``. If ``fork_exp`` is defined, Dude will fork its execution and consider the forked process as the experiment. See :ref:`spawn_or_fork` section for more details on these alternatives, and see :ref:`remote_experiments` for information on how to start experiments remotely.
 
 When Dude is invoked, it generates all optpts of an optspace by calculating its cartesian product.
 It then creates for each experiment a folder, and spawns the command line inside this folder.
@@ -59,8 +59,8 @@ A minimal Dudefile follows::
 Calling the Dude
 ----------------
 
-Dude is a command line tool which accepts several commands to start, stop, delete, filter, and aggregate experiments.
-It is usually started in a folder where there is Dudefile, for example, try ``examples/echo``.
+`dude` is a command line tool which accepts several commands to start, stop, delete, filter, and aggregate experiments.
+It is usually started in a folder where there is a Dudefile (see ``examples/echo`` for an example).
 The command ``info`` shows an overview of the Dudefile in the current folder:
 
 .. code-block:: console
@@ -83,12 +83,12 @@ The command ``info`` shows an overview of the Dudefile in the current folder:
 
 
 
-The typical workflow of a user consists however of four steps, two of them performed by Dude:
+The typical workflow of a user consists of four steps, two of them performed by Dude:
 
 1. Creation of a Dudefile;
-2. Execution experiments upon invocation of ``dude run``;
+2. Execution of experiments upon invocation of ``dude run``;
 3. Aggregation of results upon invocation of ``dude sum``;
-4. And, use of resulting aggregations for further plotting and analysis.
+4. Use of resulting aggregations for further plotting and analysis.
 
 
 Execution
