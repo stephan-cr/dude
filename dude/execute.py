@@ -248,6 +248,9 @@ def execute_isolated(cfg, optpt, folder, show_output = False):
 
                 os.chdir(wd)
                 return (False, -1 , 0)
+        except KeyboardInterrupt, e:
+            core.experiment_unlock(cfg, ".")
+            raise  # raise previous exception
         finally:
             if f: f.close()
             sys.stdout = sys.__stdout__
@@ -266,10 +269,6 @@ def execute_isolated(cfg, optpt, folder, show_output = False):
     finally:
         if fout: fout.close()
 
-        f = open(core.statusFile,'w')
-        f.write(str(status))
-        f.close()
-
         # call prepare experiment
         if hasattr(cfg, 'finish_exp'):
             if show_output:
@@ -279,12 +278,17 @@ def execute_isolated(cfg, optpt, folder, show_output = False):
             try:
                 sys.stdout = sys.stderr = f
                 cfg.finish_exp(optpt, status)
-            except:
-                pass
+            except KeyboardInterrupt, e:
+                core.experiment_unlock(cfg, ".")
+                raise  # raise previous exception
             finally:
                 if f: f.close()
                 sys.stdout = sys.__stdout__
                 sys.stderr = sys.__stderr__
+
+        f = open(core.statusFile,'w')
+        f.write(str(status))
+        f.close()
 
         # unlock experiment
         core.experiment_unlock(cfg, ".")
