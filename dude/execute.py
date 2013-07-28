@@ -277,7 +277,10 @@ def execute_isolated(cfg, optpt, folder, show_output = False):
                 f = open("dude.finish_exp", 'w')
             try:
                 sys.stdout = sys.stderr = f
-                cfg.finish_exp(optpt, status)
+                s = cfg.finish_exp(optpt, status)
+                # if finish_exp returns something, use that as status
+                # value, otherwise use execute_one status.
+                if s: status = s
             except KeyboardInterrupt, e:
                 core.experiment_unlock(cfg, ".")
                 raise  # raise previous exception
