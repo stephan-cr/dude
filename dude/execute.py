@@ -248,7 +248,7 @@ def execute_isolated(cfg, optpt, folder, show_output = False):
 
                 os.chdir(wd)
                 return (False, -1 , 0)
-        except KeyboardInterrupt, e:
+        except:
             core.experiment_unlock(cfg, ".")
             raise  # raise previous exception
         finally:
@@ -281,7 +281,7 @@ def execute_isolated(cfg, optpt, folder, show_output = False):
                 # if finish_exp returns something, use that as status
                 # value, otherwise use execute_one status.
                 if s: status = s
-            except KeyboardInterrupt, e:
+            except:
                 core.experiment_unlock(cfg, ".")
                 raise  # raise previous exception
             finally:
@@ -290,7 +290,7 @@ def execute_isolated(cfg, optpt, folder, show_output = False):
                 sys.stderr = sys.__stderr__
 
         f = open(core.statusFile,'w')
-        f.write(str(status))
+        print >>f, status
         f.close()
 
         # unlock experiment
