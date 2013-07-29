@@ -138,8 +138,8 @@ def kill_proc(cfg, proc, terminate):
     set of experiments or not"""
     proc.kill()
 
-    if hasattr(cfg, 'on_kill'):
-        cfg.on_kill(None)
+    if hasattr(cfg, 'finish_exp'):
+        cfg.finish_exp(proc.optpt, proc.status)
 
     if terminate:
         # Unlock experiment (we are in the experiment directory since
