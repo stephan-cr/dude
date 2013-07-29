@@ -93,9 +93,15 @@ group4.add_option("-d", "--dict", action = "store_true",
                   dest = "dict", default = False,
                   help = "show output in dict format")
 
+group5 = optparse.OptionGroup(parser, 'clean specific options')
+group5.add_option("--invalid", action = "store_true",
+                  dest = "invalid", default = False,
+                  help = "remove invalid folders only")
+
 parser.add_option_group(group2)
 parser.add_option_group(group3)
 parser.add_option_group(group4)
+parser.add_option_group(group5)
 
 def main(cargs):
     # folder from where dude is called
@@ -231,17 +237,20 @@ def main(cargs):
         for exp in failed:
             print exp
     elif cmd == 'clean':
-        # TODO if no filter applied, ask if that's really what the
-        # user wants.
-        r = 'y'
-        if options.filter == None and \
-                options.filter_inline == None:
-            print "sure to wanna delete everything? [y/N]"
-            r = utils.getch() #raw_input("Skip, quit, or continue?
+        if options.invalid:
+            clean.clean_invalid_experiments(cfg, experiments)
+        else:
+            # TODO if no filter applied, ask if that's really what the
+            # user wants.
+            r = 'y'
+            if options.filter == None and \
+                    options.filter_inline == None:
+                print "sure to wanna delete everything? [y/N]"
+                r = utils.getch() #raw_input("Skip, quit, or continue?
                               #[s/q/c]")
 
-        if r == 'y':
-            clean.clean_experiments(cfg, experiments)
+            if r == 'y':
+                clean.clean_experiments(cfg, experiments)
     elif cmd == 'visit-cmd':
         if len(cargs) < 2:
             print "Specify a bash command after visit-cmd"
