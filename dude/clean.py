@@ -36,6 +36,11 @@ def clean_invalid_experiments(cfg, experiments):
     folders = [f for f in folders
                if f not in valid_folders
                and f != meta_file]
+
+    if len(folders) == 0:
+        print "no invalid expfolders"
+        return
+
     print "Removing following folders: "
     for folder in folders:
         print "\t", folder
