@@ -50,10 +50,10 @@ parser.add_option("-f", "--file", dest = "expfile",
 parser.add_option("-x", "--filter", "--select",
                   dest = "filter", metavar = "FILTERS",
                   help = "select experiments using filters written in Dudefile\ne.g. -x filter1,filter2")
-parser.add_option("-y", "--filter-inline",
-                  dest = "filter_inline", metavar = "FILTERS",
-                  help = "select experiments using inline filters separated by semicolons"
-                  "\ne.g. -y \"option1=value;option2=[value3,value4]\"")
+parser.add_option("-y", "--filter-inline", action = "append",
+                  dest = "filter_inline", metavar = "FILTER",
+                  help = "select experiments using inline filters"
+                  "\ne.g. -y option1=value -y option2=[value3,value4]")
 parser.add_option("-p", "--filter-path",
                   dest = "filter_path", metavar = "PATH",
                   help = "select experiments starting with PATH"

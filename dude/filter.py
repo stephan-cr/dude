@@ -66,31 +66,42 @@ def generic_filter(experiment, outf, filters):
             return False
     return True
 
+def filter_tuple(cfg, f):
+    fs = f.split('=')
+    assert len(fs) == 2
+    (key,value) = fs
+    key = key.strip()
+    if re.match("\[.*\]", value):
+        value = utils.parse_str_list(value)
+    else:
+        value = [utils.parse_value(value)]
+        
+    # if dimension not in optspace, exit
+    if key not in cfg.optspace:
+        print key, "does not belong to optspace"
+        print "dimensions:", ','.join(cfg.optspace.keys())
+        sys.exit(1)
 
-def filter_inline(cfg, filters, invert, only_ran=True):
-    flts = []
-    for f in filters.split(';'):
-        fs = f.split('=')
-        assert len(fs) == 2
-        (key,value) = fs
-        key = key.strip()
-        if re.match("\[.*\]", value):
-            value = utils.parse_str_list(value)
-        else:
-            value = [utils.parse_value(value)]
-        flts.append((key,value))
-
-        # if dimension not in optspace exit
-        if key not in cfg.optspace:
-            print key, "does not belong to optspace"
-            print "dimensions:", ','.join(cfg.optspace.keys())
+    # if value not in optspace, exit
+    for v in value:
+        if v not in cfg.optspace[key]:
+            print v, "does not belong to dimension"
+            print "values:", ','.join(cfg.optspace.values())
             sys.exit(1)
 
-        for v in value:
-            if v not in cfg.optspace[key]:
-                cfg.optspace[key].append(v)
+    return (key,value)
 
-    return filter_experiments(cfg, [(lambda a, b: generic_filter(a,b,flts))], invert, only_ran)
+def create_inline_filter(cfg, filter_list):
+    flts = []
+    for f in filter_list:
+        flts += [filter_tuple(cfg, fi) for fi in f.split(';')]
+    return [(lambda a, b: generic_filter(a,b,flts))]
+
+def filter_inline(cfg, filters, invert, only_ran=True):
+    if type(filters) == str:
+        filters = [filters]
+    return filter_experiments(cfg, create_inline_filter(cfg, filters),
+                              invert, only_ran)
 
 def filter_path(cfg, path):
     def foo(optpt, outf):
