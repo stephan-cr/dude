@@ -38,7 +38,7 @@ desc = """Commands:
        run\t\t run all missing experiments
        sum [<NAME>]\t summarize results (NAME optional)
        status\t\t show experiments status and running experiment
-       visit-cmd <CMD>\t execute bash CMD on each experiment folder
+       visit <CMD>\t execute bash CMD on each experiment folder
 """
 
 parser = optparse.OptionParser(usage="%prog [OPTIONS] <COMMAND> <ARGS>",
@@ -251,9 +251,9 @@ def main(cargs):
 
             if r == 'y':
                 clean.clean_experiments(cfg, experiments)
-    elif cmd == 'visit-cmd':
+    elif cmd == 'visit':
         if len(cargs) < 2:
-            print "Specify a bash command after visit-cmd"
+            print "Specify a bash command after visit"
             sys.exit(1)
         elif len(cargs) > 2:
             print "Surround multi-term bash commands with \"\"."
