@@ -19,7 +19,7 @@ def filter_one(cfg, experiments, filter, invert, only_ran):
             folder = core.get_folder(cfg, experiment)
             os.chdir(folder)
             outf = open(core.outputFile)
-            outf.readline()
+            #outf.readline()
             ret = filter(experiment, outf)
             if not invert and ret:
                 filtered_experiments.append( experiment )
@@ -31,11 +31,18 @@ def filter_one(cfg, experiments, filter, invert, only_ran):
             folder = core.get_folder(cfg, experiment)
             if os.path.exists(folder):
                 os.chdir(folder)
-                ret = filter(experiment, None)
+                if os.path.exists(core.outputFile):
+                    outf = open(core.outputFile)
+                    #outf.readline()
+                else:
+                    outf = None
+                ret = filter(experiment, outf)
                 if not invert and ret:
                     filtered_experiments.append( experiment )
                 if invert and not ret:
                     filtered_experiments.append( experiment )
+
+                if outf: outf.close()
                 os.chdir(wd)
             else:
                 ret = filter(experiment, None)

@@ -47,9 +47,9 @@ parser = optparse.OptionParser(usage="%prog [OPTIONS] <COMMAND> <ARGS>",
                                formatter = utils.IndentedHelpFormatterWithNL())
 parser.add_option("-f", "--file", dest = "expfile",
                   help="read FILE as a Dudefile", metavar = "FILE")
-parser.add_option("-x", "--filter", "--select",
-                  dest = "filter", metavar = "FILTERS",
-                  help = "select experiments using filters written in Dudefile\ne.g. -x filter1,filter2")
+parser.add_option("-x", "--filter", "--select", action = "append",
+                  dest = "filter", metavar = "FILTER",
+                  help = "select experiments using filters written in Dudefile\ne.g. -x filter1 -x filter2")
 parser.add_option("-y", "--filter-inline", action = "append",
                   dest = "filter_inline", metavar = "FILTER",
                   help = "select experiments using inline filters"
@@ -178,18 +178,17 @@ def main(cargs):
     if hasattr(cfg, 'dude_version') and cfg.dude_version >= 3:
         dimensions.update(cfg)
 
-    experiments = []
-    if options.filter != None:
-        filters = []
-        for f in options.filter.split(','):
-            filters.append(cfg.filters[f])
-        experiments = filt.filter_experiments(cfg, filters,
-                                              options.invert, False)
-    elif options.filter_inline:
-        experiments = filt.filter_inline(cfg,
-                                         options.filter_inline,
-                                         options.invert, False)
-    elif options.filter_path:
+    # collect filters
+    filters = []
+    if options.filter and options.filter != []:
+        for fi in options.filter:
+            for f in fi.split(','):
+                filters.append(cfg.filters[f])
+
+    if options.filter_inline and  options.filter_inline != []:
+        filters += filt.create_inline_filter(cfg, options.filter_inline)
+
+    if options.filter_path:
         current = os.getcwd()
         if current != cfolder:
             # this assumes Dudefile is in the root of the experiment folder
@@ -200,8 +199,12 @@ def main(cargs):
         else:
             path = options.filter_path
 
-        experiments = filt.filter_experiments(cfg,
-                                              filt.filter_path(cfg, path),
+        filters += filt.filter_path(cfg, path)
+
+    # get experiments
+    experiments = []
+    if filters != []:
+        experiments = filt.filter_experiments(cfg, filters,
                                               options.invert, False)
     else:
         experiments = core.get_experiments(cfg)

@@ -132,12 +132,13 @@ summaries = [simple]
 # filters
 # =======
 #
-
-def only_times_and_greater_than(point, run, stdout):
-    if point['operation'] == 'times':
+import re
+def only_times_and_greater_than(optpt, stdout):
+    # stdout == None if experiment was not executed yet
+    if stdout and optpt['operation'] == 'times':
         for l in stdout.readlines():
-            if len(l) > 1:
-                n = float(l.split(':>')[1][:-1])
+            if len(l) > 1 and re.match("[0-9]+.*", l):
+                n = float(l)
                 if n > 0.00005 :
                     return True
     return False
