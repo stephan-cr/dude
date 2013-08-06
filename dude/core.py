@@ -153,6 +153,33 @@ def get_failed(cfg, experiments, missing = False):
                 failed.append(outputFolder)
     return failed
 
+
+def get_failed_pending_exp(cfg, experiments):
+    """Get the list of expfolders that failed or are pending"""
+    failed = []
+    pending = []
+    for exp in experiments:
+        outputFolder = get_folder(cfg, exp)
+        oFile   = os.path.join(outputFolder, outputFile)
+        sFile   = os.path.join(outputFolder, statusFile)
+        lFile   = os.path.join(outputFolder, lockFile)
+
+        if os.path.exists(lFile) or not os.path.exists(sFile):
+            pending.append(exp)
+            continue
+
+        f = open(sFile, 'r')
+        try:
+            val = int(f.readline())
+        except ValueError: # there's no number to read
+            pending.append(exp)
+            continue
+        finally:
+            f.close()
+        if val != 0:
+            failed.append(exp)
+    return (failed, pending)
+
 # def success_count(cfg, experiments):
 #     c = 0
 #     for run in range(1, cfg.runs+1):

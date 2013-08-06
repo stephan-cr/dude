@@ -31,43 +31,52 @@ import visit
 desc = """Commands:
        clean\t\t delete experiments
        create <FOLDER>\t create FOLDER and a Dudefile in it
-       failed\t\t list all failed experiments
        info\t\t show experiment description info
-       list\t\t list directories of executed experiments
-       missing\t\t list all missing experiments
+       list\t\t list experiment folders
        run\t\t run all missing experiments
        sum [<NAME>]\t summarize results (NAME optional)
        status\t\t show experiments status and running experiment
        visit <CMD>\t execute bash CMD on each experiment folder
 """
 
-parser = optparse.OptionParser(usage="%prog [OPTIONS] <COMMAND> <ARGS>",
+parser = optparse.OptionParser(usage="%prog [-f FILE] <COMMAND> [OPTIONS]",
                                version="%prog " + __version__,
                                description = desc,
                                formatter = utils.IndentedHelpFormatterWithNL())
 parser.add_option("-f", "--file", dest = "expfile",
                   help="read FILE as a Dudefile", metavar = "FILE")
-parser.add_option("-x", "--filter", "--select", action = "append",
+parser.add_option("-a", "--arg", action = "append",
+                  dest = "margs", metavar = "ARG",
+                  help = "set variables in Dudefile"
+                  "\ne.g. -a var1=value -a var2=[value3,value4]"
+                  )
+
+group1 = optparse.OptionGroup(parser, 'coarse experiment selection (can be combined, default: all)')
+group1.add_option("--pending", default = False,
+                  dest = "pending", action = "store_true",
+                  help = "select pending experiments")
+group1.add_option("--failed", default = False,
+                  dest = "failed", action = "store_true",
+                  help = "select failed experiments")
+group1.add_option("--success", default = False,
+                  dest = "success", action = "store_true",
+                  help = "select successfully terminated experiments")
+
+group6 = optparse.OptionGroup(parser, 'fine experiment selection (can be combined, default: none)')
+group6.add_option("-x", "--filter", action = "append",
                   dest = "filter", metavar = "FILTER",
                   help = "select experiments using filters written in Dudefile\ne.g. -x filter1 -x filter2")
-parser.add_option("-y", "--filter-inline", action = "append",
+group6.add_option("-y", "--filter-inline", action = "append",
                   dest = "filter_inline", metavar = "FILTER",
                   help = "select experiments using inline filters"
                   "\ne.g. -y option1=value -y option2=[value3,value4]")
-parser.add_option("-p", "--filter-path",
+group6.add_option("-p", "--filter-path",
                   dest = "filter_path", metavar = "PATH",
                   help = "select experiments starting with PATH"
                   "\ne.g. -p \"raw/exp__optionXvalY\"")
-parser.add_option("-i",  "--invert-filters", default = False,
+group6.add_option("-i",  "--invert-filters", default = False,
                   dest = "invert", action = "store_true",
                   help = "invert filter selection")
-parser.add_option("-a", "--args",
-                  dest = "margs", metavar = "ARGS",
-                  help = "arguments to Dudefile separated by semicolons"
-                  "\ne.g. -a \"option1=value;option2=[value3,value4]\"")
-parser.add_option("-o", default = False,
-                  dest = "show_output", action = "store_true",
-                  help = "show experiment's output")
 
 group2 = optparse.OptionGroup(parser, 'run specific options')
 group2.add_option("--force", action = "store_true",
@@ -79,6 +88,9 @@ group2.add_option("--skip-global", default = False,
 group2.add_option("--global-only", default = False,
                   dest = "global_only", action = "store_true",
                   help = "run global prepare only")
+group2.add_option("-o", "--show-output", default = False,
+                  dest = "show_output", action = "store_true",
+                  help = "show experiment's output")
 
 group3 = optparse.OptionGroup(parser, 'sum specific options')
 group3.add_option('-b', '--backend', dest = 'backend', default = 'file',
@@ -98,6 +110,8 @@ group5.add_option("--invalid", action = "store_true",
                   dest = "invalid", default = False,
                   help = "remove invalid folders only")
 
+parser.add_option_group(group1)
+parser.add_option_group(group6)
 parser.add_option_group(group2)
 parser.add_option_group(group3)
 parser.add_option_group(group4)
@@ -171,7 +185,7 @@ def main(cargs):
 
     # parse arguments to module
     if options.margs:
-        margs = args.parse(options.margs)
+        margs = args.parse(";".join(options.margs))
         print "Passing arguments:", margs
         args.set_args(cfg, margs)
 
@@ -202,12 +216,37 @@ def main(cargs):
         filters += filt.filter_path(cfg, path)
 
     # get experiments
-    experiments = []
-    if filters != []:
-        experiments = filt.filter_experiments(cfg, filters,
-                                              options.invert, False)
+    experiments = core.get_experiments(cfg)
+
+    # select the set of experiments to be considered (successful,
+    # failed or pending)
+    if (options.success and options.failed and options.pending) or\
+            not (options.success or options.failed or options.pending):
+        pass
     else:
-        experiments = core.get_experiments(cfg)
+        failed, pending = core.get_failed_pending_exp(cfg, experiments)
+        expin  = []
+        expout = []
+
+        if options.failed:
+            expin += failed
+        else:
+            expout += failed
+
+        if options.pending:
+            expin += pending
+        else:
+            expout += pending
+
+        if options.success:
+            experiments = [exp for exp in experiments if exp not in expout]
+        else:
+            experiments = expin
+
+    # apply filters
+    if filters != []:
+        experiments = filt.filter_experiments(cfg, filters, options.invert,
+                                              False, experiments)
 
     cmd = cargs[0]
     if cmd == 'run':

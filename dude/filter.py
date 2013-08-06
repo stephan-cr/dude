@@ -54,10 +54,12 @@ def filter_one(cfg, experiments, filter, invert, only_ran):
     return filtered_experiments
 
 
-def filter_experiments(cfg, filters, invert, only_ran=True):
+def filter_experiments(cfg, filters, invert, only_ran=True, experiments = None):
     """ """
-    experiments = core.get_experiments(cfg)
-    filtered_experiments = experiments
+    if experiments:
+        filtered_experiments = experiments
+    else:
+        filtered_experiments = core.get_experiments(cfg)
 
     for f in filters:
         filtered_experiments  = filter_one(cfg, filtered_experiments, f, invert, only_ran)
