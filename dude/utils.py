@@ -74,6 +74,13 @@ def unselect(options, unselection):
             s[k] = options[k]
     return s
 
+def pick(options, selection):
+    s = [] 
+    for k in selection:
+        assert k in options
+        s.append(options[k])
+    return tuple(s)
+
 def chop(l, r):
     """
     Removes from list `l` all items in the intersection between lists `l` and `r`.
