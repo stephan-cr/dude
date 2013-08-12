@@ -72,7 +72,7 @@ group6.add_option("-y", "--filter-inline", action = "append",
                   "\ne.g. -y option1=value -y option2=[value3,value4]")
 group6.add_option("-p", "--filter-path",
                   dest = "filter_path", metavar = "PATH",
-                  help = "select experiments starting with PATH"
+                  help = "select experiment matching PATH"
                   "\ne.g. -p \"raw/exp__optionXvalY\"")
 group6.add_option("-i",  "--invert-filters", default = False,
                   dest = "invert", action = "store_true",
