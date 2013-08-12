@@ -95,7 +95,7 @@ def filter_tuple(cfg, f):
     for v in value:
         if v not in cfg.optspace[key]:
             print v, "does not belong to dimension"
-            print "values:", ','.join(cfg.optspace.values())
+            print "values:", ','.join([str(i) for i in cfg.optspace[key]])
             sys.exit(1)
 
     return (key,value)
