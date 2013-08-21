@@ -1,0 +1,255 @@
+# -*- sh -*-
+################################################################################
+# Copyright (c) 2013 Diogo Behrens
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+# THE SOFTWARE.
+################################################################################
+#
+# dude auto-completion for bash
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#
+# There are two options how to install this file:
+#
+# 1. Copy this file into /etc/bash_completion
+#
+# 2. Copy this file somewhere in your $HOME, for example, $HOME/.dude_completion,
+#    and add this file to your .bashrc or .profile like this:
+#
+#      source $HOME/.dude_completion  
+#
+################################################################################
+
+
+# looks for options and return those found 
+_dude_find_opt()
+{
+    local opts done
+    opts=$1
+    done=0
+
+    for i in $(seq 0 $(expr $COMP_CWORD - 1)); do
+	for opt in $opts; do
+	    if [ "${COMP_WORDS[$i]}" = "$opt" ]; then
+		opt=${COMP_WORDS[$i]}
+		done=1
+	    fi
+	    if [ $done -eq 1 ]; then
+		break
+	    fi
+        done
+        if [ $done -eq 1 ]; then
+	    break
+	fi
+    done
+
+    if [ $done -eq 1 ]; then
+    	echo $opt
+    else
+    	echo ""
+    fi
+}
+
+# find whether a command was given the options
+_dude_select_command()
+{
+    local cur cmds
+
+    COMPREPLY=()
+    cur="${COMP_WORDS[COMP_CWORD]}"
+
+    cfg=$(_dude_find_opt "-f")
+
+    if [ -f "Dudefile" ] || [ "$cfg" != "" ]; then
+	local cmds="run sum info list clean visit"
+	COMPREPLY=( $( compgen -W "${cmds} -h" -- $cur ) )
+    else
+	local cmds="create"
+	COMPREPLY=( $( compgen -W "${cmds} -f -v -h" -- $cur ) )
+    fi
+}
+
+# auto completion main function
+_dude()
+{
+    local cur prev cmd opts
+    COMPREPLY=()
+
+    if [[ $stop -eq 1 ]]; then
+	return
+    fi
+
+    cur="${COMP_WORDS[COMP_CWORD]}"
+    prev="${COMP_WORDS[COMP_CWORD-1]}"
+
+    # we suggest the first argument to be the command
+    if [ $COMP_CWORD -eq 1 ]; then
+	_dude_select_command
+	return
+    fi
+
+    # there must be a command
+    cmd=$(_dude_find_opt "run sum info list clean create visit")
+
+    case $prev in
+	-f)
+	    COMPREPLY=( $( compgen -f -- $cur ) )
+	    ;;
+	-y)
+	    # echo syntax? dude info grep the optspaces?
+	    # _dude_inline_stor
+	    COMPREPLY=()
+	    ;;
+	-p)
+	    COMPREPLY=( $( compgen -d -W "." -- $cur ) )
+	    ;;
+	*)
+	    case $cmd in
+		info)
+		    opts="-h"
+		    COMPREPLY=( $( compgen -W "$opts" -- $cur ) )
+		    ;;
+		run)
+		    opts="-h"
+		    if [ -z $(_dude_find_opt "--failed") ]; then
+		    	opts="$opts --failed"
+		    fi
+		    if [ -z $(_dude_find_opt "--pending") ]; then
+		    	opts="$opts --pending"
+		    fi
+		    if [ -z $(_dude_find_opt "--success") ]; then
+		    	opts="$opts --success"
+		    fi
+		    if [ -z $(_dude_find_opt "-p") ]; then
+		    	opts="$opts -y"
+		    fi
+		    if [ -z $(_dude_find_opt "-y") ]; then
+		    	opts="$opts -p"
+		    fi
+		    if [ -z $(_dude_find_opt "-i") ]; then
+		    	opts="$opts -i"
+		    fi
+		    if [ -z $(_dude_find_opt "--force") ]; then
+		    	opts="$opts --force"
+		    fi
+		    if [ -z $(_dude_find_opt "--global-only --skip-global") ]; then
+		    	opts="$opts --skip-global"
+		    fi
+		    if [ -z $(_dude_find_opt "-y -p --failed --pending "\
+				"--sucess --skip-global") ]; then
+		    	opts="$opts --global-only"
+		    fi
+
+		    COMPREPLY=( $( compgen -W "$opts" -- $cur ) )
+		    ;;
+		sum)
+		    opts="-h"
+		    if [ -z $(_dude_find_opt "--failed") ]; then
+		    	opts="$opts --failed"
+		    fi
+		    if [ -z $(_dude_find_opt "--pending") ]; then
+		    	opts="$opts --pending"
+		    fi
+		    if [ -z $(_dude_find_opt "--success") ]; then
+		    	opts="$opts --success"
+		    fi
+		    if [ -z $(_dude_find_opt "-p") ]; then
+		    	opts="$opts -y"
+		    fi
+		    if [ -z $(_dude_find_opt "-i") ]; then
+		    	opts="$opts -i"
+		    fi
+		    if [ -z $(_dude_find_opt "--status-ignore") ]; then
+			opts="$opts --status-ignore"
+		    fi
+
+		    COMPREPLY=( $( compgen -W "$opts" -- $cur ) )
+		    ;;
+		clean)
+		    opts="-h"
+		    if [ -z $(_dude_find_opt "--failed") ]; then
+		    	opts="$opts --failed"
+		    fi
+		    if [ -z $(_dude_find_opt "--pending") ]; then
+		    	opts="$opts --pending"
+		    fi
+		    if [ -z $(_dude_find_opt "--success") ]; then
+		    	opts="$opts --success"
+		    fi
+		    if [ -z $(_dude_find_opt "-p") ]; then
+		    	opts="$opts -y"
+		    fi
+		    if [ -z $(_dude_find_opt "-i") ]; then
+		    	opts="$opts -i"
+		    fi
+		    if [ -z $(_dude_find_opt "--invalid") ]; then
+			opts="$opts --invalid"
+		    fi
+
+		    COMPREPLY=( $( compgen -W "$opts" -- $cur ) )
+		    ;;
+		list)
+		    opts="-h"
+		    if [ -z $(_dude_find_opt "--failed") ]; then
+		    	opts="$opts --failed"
+		    fi
+		    if [ -z $(_dude_find_opt "--pending") ]; then
+		    	opts="$opts --pending"
+		    fi
+		    if [ -z $(_dude_find_opt "--success") ]; then
+		    	opts="$opts --success"
+		    fi
+		    if [ -z $(_dude_find_opt "-p") ]; then
+		    	opts="$opts -y"
+		    fi
+		    if [ -z $(_dude_find_opt "-i") ]; then
+		    	opts="$opts -i"
+		    fi
+
+		    COMPREPLY=( $( compgen -W "$opts" -- $cur ) )
+		    ;;
+		visit)
+		    opts="-h"
+		    if [ -z $(_dude_find_opt "--failed") ]; then
+		    	opts="$opts --failed"
+		    fi
+		    if [ -z $(_dude_find_opt "--pending") ]; then
+		    	opts="$opts --pending"
+		    fi
+		    if [ -z $(_dude_find_opt "--success") ]; then
+		    	opts="$opts --success"
+		    fi
+		    if [ -z $(_dude_find_opt "-p") ]; then
+		    	opts="$opts -y"
+		    fi
+		    if [ -z $(_dude_find_opt "-i") ]; then
+		    	opts="$opts -i"
+		    fi
+
+		    COMPREPLY=( $( compgen -W "$opts" -- $cur ) )
+		    ;;
+		"")
+		    _dude_select_command
+		    ;;
+		*)
+		    COMPREPLY=( $( compgen -W "-h" -- $cur ) )
+	    esac
+    esac
+    return 0
+}
+complete -F _dude dude
