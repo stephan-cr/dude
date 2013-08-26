@@ -143,6 +143,7 @@ def get_failed(cfg, experiments, missing = False):
         try:
             val = int(f.readline())
         except ValueError: # there's no number to read
+            print "no status for " + sFile
             return False
         finally:
             f.close()
