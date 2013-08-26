@@ -56,10 +56,13 @@ class JsonSumBackend:
 
     def write(self, string):
         subdoc = self.__jsonobj
-        values = string.strip().split()
-
+        values = string.strip().split(None, len(self.__header) - 1)
+        
         if len(values) != len(self.__header):
             return
+
+        if '{' in values[len(values) - 1]:
+            values[len(values) - 1] = json.loads(values[len(values) - 1])
 
         for i in range(len(self.__dimensions)):
             subdoc = subdoc.setdefault(self.__header[i], {})

@@ -253,5 +253,16 @@ class JsonSelect(SummaryBase):
 
             s = self.format(optpt, *objs)
 
+            keys = optpt.keys()
+            keys.sort()
+            s = ''
+            for k in keys:
+                s += optpt[k] + ' '
+            for arg in objs:
+                if isinstance(arg, dict):
+                    s += ' ' + json.dumps(arg)
+                else:
+                    s += ' ' + str(arg)
+
             group_out.write(s)
             f.close()
