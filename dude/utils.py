@@ -206,10 +206,13 @@ class IndentedHelpFormatterWithNL(optparse.IndentedHelpFormatter):
         return "".join(result)
 
 def parse_value(v):
+    v = str(v).strip()
+    if v == 'True': return True
+    if v == 'False': return False
     try:
         return int(v)
     except:
-        return v.strip()
+        return v
 
 def parse_str_list(l):
     ls = l.split('[')
