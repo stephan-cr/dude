@@ -101,6 +101,8 @@ class FilesLineSelect(SummaryBase):
             files = glob.glob(self.files)
         else:
             assert type(self.files) == list
+            files = [glob.glob(f) for f in self.files]
+            files = [f for fg in files for f in fg] # flatten
 
         #if not self.quiet:
         print "FilesLineSelect using files ", files
@@ -186,6 +188,8 @@ class FilesMultiLineSelect(SummaryBase):
             files = glob.glob(self.files)
         else:
             assert type(self.files) == list
+            files = [glob.glob(f) for f in self.files]
+            files = [f for fg in files for f in fg] # flatten
 
         if not self.quiet():
             print "FilesMultiLineSelect using files ", files

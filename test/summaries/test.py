@@ -16,6 +16,12 @@ print s.header(optpt.keys())
 s.visit(optpt, f, sys.stdout)
 print "----------"
 
+s = dude.summaries.FilesLineSelect("test", files=['bla.*'], header = 'val')
+f = open('/dev/null')
+print s.header(optpt.keys())
+s.visit(optpt, f, sys.stdout)
+print "----------"
+
 s = dude.summaries.MultiLineSelect(
     "test", 
     filters = [
@@ -31,6 +37,19 @@ print "----------"
 s = dude.summaries.FilesMultiLineSelect(
     "test",
     files  = "bla*",
+    filters = [
+        ('hey', '.*', (lambda l:l)),
+        ('ho', '.*', (lambda l:l))
+        ]
+    )
+f = open('/dev/null')
+print s.header(optpt.keys())
+s.visit(optpt, f, sys.stdout)
+print "----------"
+
+s = dude.summaries.FilesMultiLineSelect(
+    "test",
+    files  = ["bla*"],
     filters = [
         ('hey', '.*', (lambda l:l)),
         ('ho', '.*', (lambda l:l))
