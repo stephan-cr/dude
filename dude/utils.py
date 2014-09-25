@@ -5,6 +5,7 @@
 """
 Utility functions to handle lists and dictionaries.
 """
+import errno
 import os
 import sys
 
@@ -26,8 +27,12 @@ def __cartesian(sets, i, element):
 
 # Check Folder
 def checkFolder(folder):
-    if not os.path.exists(folder):
+    try:
         os.makedirs(folder)
+    except OSError as e:
+        # if directory already exists: fine
+        if e.errno != errno.EEXIST: # file exists
+            raise
 
 
 # groupBy()

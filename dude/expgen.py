@@ -3,13 +3,17 @@
 # See accompanying file LICENSE
 
 """ generates create directory for an experiment and an empty Dudefile"""
+import errno
 import os
 import string
 
 def __create_folder(folder):
-    if not os.path.exists(folder):
+    try:
         os.makedirs(folder)
-
+    except OSError as e:
+        # if directory already exists: fine
+        if e.errno != errno.EEXIST:
+            raise
 
 
 dfile = """\
