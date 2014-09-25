@@ -111,7 +111,7 @@ def print_elapsed(timeout, elapsed, last_elapsed = None):
         # mock the limit just to show some progress
         timeout = 60
         if elapsed > timeout:
-            timeout = elapsed * 1.5 
+            timeout = elapsed * 1.5
     b = PBar(20)
     p = elapsed * 1000 / timeout * 100
     p /= 1000

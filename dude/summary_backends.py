@@ -57,7 +57,7 @@ class JsonSumBackend:
     def write(self, string):
         subdoc = self.__jsonobj
         values = string.strip().split(None, len(self.__header) - 1)
-        
+
         if len(values) != len(self.__header):
             return
 

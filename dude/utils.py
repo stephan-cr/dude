@@ -75,7 +75,7 @@ def unselect(options, unselection):
     return s
 
 def pick(options, selection):
-    s = [] 
+    s = []
     for k in selection:
         assert k in options
         s.append(options[k])

@@ -11,7 +11,7 @@ import re
 class SummaryBase:
     """
     Base class for summaries.
-    
+
     :param name: prefix of output filename
     :param groupby: groupby dimensions
     :param header: columns string separated by spaces
@@ -37,7 +37,7 @@ class SummaryBase:
 
     def groupby(self):
         return self._groupby
-    
+
     def format(self, optpt, *args):
         #assert len(values.split(' ')) == len(self.header.split(' '))
         keys = optpt.keys()
@@ -57,7 +57,7 @@ class LineSelect(SummaryBase):
     :param regex: regex to select lines
     :param split: function to split selected lines, if None, `(lambda l: l)`.
     """
-    def __init__(self, name, groupby = [], header = None, 
+    def __init__(self, name, groupby = [], header = None,
                  regex = '.*', split = None, quiet = False):
         SummaryBase.__init__(self, name, groupby, header, quiet)
         self.regex  = regex
@@ -81,7 +81,7 @@ class FilesLineSelect(SummaryBase):
     :param fname_header: header for filename, default = "fname"
     """
     def __init__(self, name, files, groupby = [], header = None,
-                 regex = '.*', 
+                 regex = '.*',
                  split = None,
                  fname_split = None,
                  fname_header = "fname",
