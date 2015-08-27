@@ -28,7 +28,7 @@ class MetaData:
 
         meta_tmp = 'meta-%d.tmp' % os.getpid()
         with open(os.path.join(raw_folder, meta_tmp), 'wb') as meta_file:
-            cPickle.dump(self, meta_file, 2)
+            cPickle.dump(self, meta_file, cPickle.HIGHEST_PROTOCOL)
             os.fsync(meta_file)
 
         os.rename(os.path.join(raw_folder, meta_tmp),

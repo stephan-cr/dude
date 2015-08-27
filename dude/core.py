@@ -6,9 +6,12 @@
 Core functionality consists of generating points in the options space
 and generating names out of options.
 """
+
+import errno
+import fcntl
 import os
 import sys
-import fcntl
+
 import utils
 
 ### some constants ####
@@ -230,7 +233,7 @@ def experiment_lock(cfg, folder):
             lockFileHandle.write("%d\n" % os.getpid())
             lockFileHandle.flush()
         except IOError as e:
-            if e.args[0] == 11: # Resource temporarily unavailable
+            if e.args[0] == errno.EAGAIN: # Resource temporarily unavailable
                 lockFileHandle.close()
                 return False
             else:
