@@ -1,4 +1,4 @@
-# Copyright (c) 2011, 2012 Stephan Creutz
+# Copyright (c) 2011, 2012, 2013, 2014, 2015 Stephan Creutz
 # Distributed under the MIT License
 # See accompanying file LICENSE
 
