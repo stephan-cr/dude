@@ -26,11 +26,12 @@ class MetaData:
         saves metadata of the experiment
         '''
 
-        meta_file = open(os.path.join(raw_folder, 'meta.tmp'), 'wb')
-        cPickle.dump(self, meta_file, 2)
-        os.fsync(meta_file)
-        meta_file.close()
-        os.rename(os.path.join(raw_folder, 'meta.tmp'),
+        meta_tmp = 'meta-%d.tmp' % os.getpid()
+        with open(os.path.join(raw_folder, meta_tmp), 'wb') as meta_file:
+            cPickle.dump(self, meta_file, 2)
+            os.fsync(meta_file)
+
+        os.rename(os.path.join(raw_folder, meta_tmp),
                   os.path.join(raw_folder, META_FILE))
 
     def __str__(self):
