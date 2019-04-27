@@ -4,11 +4,10 @@ Dude
 
 The Dude is a framework to describe a set of configurations, to
 execute them in experiments and to process the results into
-summaries. Dude uses a description file in
-Python_ to prepare, execute and summarize
-experiments.
+summaries. Dude uses a description file in Python_ to prepare, execute
+and summarize experiments.
 
-.. _Python: http://www.python.org/
+.. _Python: https://www.python.org/
 
 Installation
 ------------
@@ -80,7 +79,7 @@ Documentation
 
 More details can be found in the `full documentation`_.
 
-.. _full documentation: http://dude.readthedocs.org
+.. _full documentation: https://dude.readthedocs.org
 
 Contribute
 ----------
