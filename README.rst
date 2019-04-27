@@ -80,7 +80,7 @@ Documentation
 
 More details can be found in the `full documentation`_.
 
-.. _full documentation: http://dude.readthedocs.org.
+.. _full documentation: http://dude.readthedocs.org
 
 Contribute
 ----------
